@@ -4,6 +4,7 @@ namespace Nomen\Plugin\Pages;
 use Nomen\Src\ActivityLog;
 use Nomen\Src\Brand;
 use Nomen\Src\Csrf;
+use Nomen\Src\Hooks;
 use Nomen\Src\Response;
 use Nomen\Src\Router;
 use Nomen\Src\Session;
@@ -71,7 +72,11 @@ class Controller
             return;
         }
 
+        $data = Hooks::filter('pages.content.before_save', $data, null, true);
+
         $pageId = Store::create($data, (int)Session::get('user_id'));
+
+        Hooks::run('pages.content.saved', [$pageId, $data, true, (int)Session::get('user_id')]);
 
         ActivityLog::record([
             'action'      => 'pages.create',
@@ -83,7 +88,7 @@ class Controller
         ]);
 
         Session::flash('pages_success', t('页面已创建'));
-        Response::redirect(Plugin::basePath() . '/' . $data['slug']);
+        Response::redirect(self::afterSaveUrl($data['slug']));
     }
 
     public static function edit(string $slug): void
@@ -120,7 +125,11 @@ class Controller
             return;
         }
 
+        $data = Hooks::filter('pages.content.before_save', $data, $page, false);
+
         Store::update((int)$page['id'], $data, (int)Session::get('user_id'));
+
+        Hooks::run('pages.content.saved', [(int)$page['id'], $data, false, (int)Session::get('user_id')]);
 
         $before = self::pageFields($page);
         ActivityLog::record([
@@ -134,7 +143,7 @@ class Controller
         ]);
 
         Session::flash('pages_success', t('页面已保存'));
-        Response::redirect(Plugin::basePath() . '/' . $data['slug']);
+        Response::redirect(self::afterSaveUrl($data['slug']));
     }
 
     public static function destroy(string $slug): void
@@ -146,6 +155,8 @@ class Controller
             Response::error(404);
             return;
         }
+
+        Hooks::run('pages.content.deleted', [(int)$page['id'], $page, (int)Session::get('user_id')]);
 
         Store::delete((int)$page['id']);
 
@@ -161,7 +172,14 @@ class Controller
         ]);
 
         Session::flash('pages_success', t('页面已删除'));
-        Response::redirect(Plugin::basePath());
+        Response::redirect(($_POST['_return'] ?? '') === 'admin' ? '/admin/content?tab=all' : Plugin::basePath());
+    }
+
+    private static function afterSaveUrl(string $slug): string
+    {
+        return ($_POST['_return'] ?? '') === 'admin'
+            ? '/admin/content?tab=all'
+            : Plugin::basePath() . '/' . $slug;
     }
 
     public static function css(): void

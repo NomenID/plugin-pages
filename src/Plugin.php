@@ -20,6 +20,8 @@ class Plugin
         Plugins::route('GET', $base . '/{slug}', [Controller::class, 'show']);
 
         Plugins::command('pages:sync', [Store::class, 'sync'], '把 content/ 里还没进库的文档页导入');
+
+        Admin::register();
     }
 
     /**

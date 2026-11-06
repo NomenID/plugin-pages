@@ -47,6 +47,19 @@ Pages 是独立项目，不属于 Nomen 本体，按 GPLv3 单独发布：
 | `sort_order` | 列表和侧栏排序，小的在前 |
 | `updated_by` | 最后修改的管理员 |
 
+## 后台
+
+插件在后台「内容」分组注册 `/admin/content`，三个选项卡：全部、已发布、草稿。列表里可以直接编辑、查看和删除；编辑器支持改地址、摘要、Markdown 正文、发布状态和排序。
+
+面板是服务端 HTML（外层是 Nomen 的 Vue 后台），表单带 `data-admin-ajax`，保存后回到列表。其它插件可以挂这些钩子：
+
+| 钩子 | 类型 | 参数 | 时机 |
+|---|---|---|---|
+| `pages.content.before_save` | filter | `data`, `existing`（新建时为 null）, `isNew` | 写库前，可改字段 |
+| `pages.content.saved` | run | `pageId`, `data`, `isNew`, `userId` | 保存后 |
+| `pages.content.deleted` | run | `pageId`, `page`, `userId` | 删除前 |
+| `pages.admin.editor.extras` | filter | `html`, `page` | 编辑器底部，可加自定义字段说明 |
+
 ## 许可
 
 GPL-3.0-only，协议全文见 [LICENSE](LICENSE)。

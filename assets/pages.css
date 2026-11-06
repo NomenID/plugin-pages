@@ -21,13 +21,19 @@
     line-height: 1.3;
 }
 
-.docs-head > a {
+.docs-head > a:not(.btn) {
     font-size: 0.875rem;
     color: var(--color-text-muted);
 }
 
-.docs-head > a:hover {
+.docs-head > a:not(.btn):hover {
     color: var(--color-primary);
+}
+
+/* 特化页的 a 颜色比 .btn-primary 更具体，会把按钮文字压成同色 */
+.docs-head > a.btn,
+.docs-head > a.btn:hover {
+    color: #fff;
 }
 
 .docs-lead {
