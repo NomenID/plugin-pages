@@ -11,6 +11,8 @@ Nomen 最后只需要一份配置文件：`config/installed.php`。里面有数�
 
 入口在 `public/index.php`，nginx / Apache 的 root 必须指到 `public/`。指到项目根的话，你会看到根目录那个 `index.html`，它在提醒你改这里。
 
+root 改到 `public/` 之后这个文件就打不开了，可以删掉。删的是项目根目录那个 `index.html`，`public/` 里的文件别动。
+
 ## 伪静态
 
 安装页第 1 步会自动检测。也可以直接访问 `/__rewrite_probe`：返回 `ok` 就说明伪静态没问题，返回 404 就是没配。
@@ -29,10 +31,11 @@ Apache 的 `public/.htaccess` 已经带了规则，确认 `mod_rewrite` 开了�
 
 1. 把代码放到站点目录（发布 zip 解压即可，`vendor/` 和前端产物都在里面）。
 2. 浏览器打开站点，没装过会自动跳到 `/nomen-install/`。
-3. 五步：环境检查 → 数据库 → 站点与管理员 → 扩展 → 安装。
+3. 七步：环境检查 → 数据库 → 站点 → 管理员 → 扩展 → 邮件（先问要不要现在配）→ 确认。
 4. 扩展这一步默认勾 `open-platform` 和 `pages`，`geoip` 按需勾。装完还能改 `config/plugins.php`。
-5. 装完把 `public/nomen-install/` 删掉或改名——留着等于把安装页开放给所有人。
-6. 打开站点，用刚建的管理员登录。
+5. 装完按页面提示收尾：PHP 能写 `config/` 时，页面会显示「进入网站」和「用管理员账号登录」，`installed.php` 已经生成；不能写时，页面会给一份内容，下载成 `installed.php` 传到 `config/`。
+6. 把 `public/nomen-install/` 删掉或改名——留着等于把安装页开放给所有人。
+7. 之后从站点首页或 `/login` 都能进。
 
 ## 命令行
 
