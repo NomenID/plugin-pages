@@ -1,0 +1,29 @@
+{
+    "name": "Pages",
+    "version": "1.0.0",
+    "description": "站内文档页面：在 Nomen 里写指南，不用另建文档站",
+    "license": "GPL-3.0-only",
+    "author": [
+        "Yunyun"
+    ],
+    "requires": {
+        "Nomen": ">=1.0"
+    },
+    "autoload": {
+        "Nomen\\Plugin\\Pages\\": "src/"
+    },
+    "mounts": {
+        "docs": {
+            "path": "/w",
+            "title": "站内文档",
+            "description": "在 Nomen 里写指南，管理员在站内编辑",
+            "access": "public",
+            "config": "base_path"
+        }
+    },
+    "boot": [
+        "Nomen\\Plugin\\Pages\\Plugin",
+        "boot"
+    ],
+    "homepage": "https://github.com/NomenID/plugin-pages"
+}
