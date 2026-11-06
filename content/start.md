@@ -1,26 +1,23 @@
 ---
-title: 概览
+title: 欢迎
 slug: start
-summary: Nomen 是什么，文档从哪里看起。
+summary: 这个站用 Nomen 搭的账号中心。文档和入口在这里。
 sort: 10
 ---
 
-Nomen 是自托管的账号中心：一台服务器跑一份，几个站点共用一套账号，通过 OAuth 2.0 接入。登录、二步验证、找回密码和账号设置都在站内完成。
+这个站的登录、二步验证、找回密码和账号设置，由 Nomen 提供——一个自托管的账号中心，几个站点可以共用一套账号。
 
-官方站点 https://nomen.caellab.com/ 就是用它自己跑的，这份文档也写在 Pages 插件里。
+Nomen 是自由软件，源码在 GitHub：[NomenID/Nomen](https://github.com/NomenID/Nomen)。
 
-## 从哪里看起
+## 完整文档
 
-- [安装与升级](install)：把 Nomen 跑起来，或者升级到新版本。
-- [应用接入](oauth)：让别的站点用 Nomen 登录。
-- [开放平台](open-platform)：开发者注册、自助建应用。
-- [管理后台](admin)：用户、应用、接入点和恢复工单。
-- [插件](plugins)：写一个插件，给 Nomen 加功能。
-- [钩子](hooks)：核心会发哪些事件。
-- [模板](templates)：改页面、覆盖布局、插件模板。
-- [皮肤](skins)：换一套外观。
-- [源码与许可](source)：代码在哪、怎么许可。
+安装、接入、插件和皮肤这些文档维护在项目官方站：
 
-## 环境
+- [Nomen 官方站](https://nomen.caellab.com/)，文档从 [概览](https://nomen.caellab.com/w/start) 看起
+- [安装与升级](https://nomen.caellab.com/w/install)
+- [应用接入](https://nomen.caellab.com/w/oauth)（让别的站点用 Nomen 登录）
 
-PHP 8.1+、MySQL 8、Composer；Redis 可选，没有会降级。改前端还需要 Node 18+。
+## 这个站自己的页面
+
+- [沙盒](sandbox)：Markdown 能写成什么样，看这一页就知道。
+- 管理员可以在 `/w` 列表页新建页面，每页右上角有「编辑」。文档、更新日志，想写什么都写在这里。

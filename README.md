@@ -17,7 +17,7 @@ Pages 是独立项目，不属于 Nomen 本体，按 GPLv3 单独发布：
 }
 ```
 
-装完打开 `/w`。第一次访问会自动建 `pages` 表，并把 `content/` 里的初始文档导进去；表已经存在就不会再导。后来新增的文档用 `php bin/nomen plugins pages:sync` 补，只补缺，不覆盖已经在站内改过的页面。
+装完打开 `/w`。第一次访问会自动建 `pages` 表，并把 `content/` 里的初始文档导进去（只有「欢迎」和「沙盒」两页，完整文档维护在 Nomen 官方站）；表已经存在就不会再导。后来新增的文档用 `php bin/nomen plugins pages:sync` 补，只补缺，不覆盖已经在站内改过的页面。
 
 ## 谁能编辑
 
