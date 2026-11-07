@@ -21,7 +21,7 @@ class Controller
             'base' => $base,
             'isAdmin' => $isAdmin,
             'notice' => Session::getFlash('pages_success'),
-        ], t('文档'));
+        ], t('Docs'));
     }
 
     public static function show(string $slug): void
@@ -63,7 +63,7 @@ class Controller
 
         [$data, $error] = self::input();
         if ($error === null && Store::slugExists($data['slug'])) {
-            $error = t('这个地址已经被占用了');
+            $error = t('That address is already taken');
         }
 
         if ($error !== null) {
@@ -87,7 +87,7 @@ class Controller
             'summary'     => '创建页面「' . $data['title'] . '」',
         ]);
 
-        Session::flash('pages_success', t('页面已创建'));
+        Session::flash('pages_success', t('Page created'));
         Response::redirect(self::afterSaveUrl($data['slug']));
     }
 
@@ -114,7 +114,7 @@ class Controller
 
         [$data, $error] = self::input();
         if ($error === null && Store::slugExists($data['slug'], (int)$page['id'])) {
-            $error = t('这个地址已经被占用了');
+            $error = t('That address is already taken');
         }
 
         if ($error !== null) {
@@ -142,7 +142,7 @@ class Controller
             'changes'     => ActivityLog::diff($before, self::pageFields($data), array_keys($before)),
         ]);
 
-        Session::flash('pages_success', t('页面已保存'));
+        Session::flash('pages_success', t('Page saved'));
         Response::redirect(self::afterSaveUrl($data['slug']));
     }
 
@@ -171,7 +171,7 @@ class Controller
             'changes'     => ActivityLog::diff($before, [], array_keys($before)),
         ]);
 
-        Session::flash('pages_success', t('页面已删除'));
+        Session::flash('pages_success', t('Page deleted'));
         Response::redirect(($_POST['_return'] ?? '') === 'admin' ? '/admin/content?tab=all' : Plugin::basePath());
     }
 
@@ -227,8 +227,8 @@ class Controller
             'error' => $error,
             'base' => Plugin::basePath(),
         ], $isNew
-            ? t('新建页面')
-            : t('编辑：{:title}', ['title' => (string)($page['title'] ?? '')]));
+            ? t('New page')
+            : t('Edit: {:title}', ['title' => (string)($page['title'] ?? '')]));
     }
 
     private static function render(string $template, array $data, string $title): void
@@ -284,13 +284,13 @@ class Controller
         ];
 
         if ($title === '') {
-            return [$data, t('标题不能为空')];
+            return [$data, t('Title is required')];
         }
         if (!preg_match('/^[a-z0-9][a-z0-9-]{0,99}$/', $slug)) {
-            return [$data, t('地址只能用小写字母、数字和连字符')];
+            return [$data, t('The address may only use lowercase letters, digits, and hyphens')];
         }
         if (in_array($slug, ['new', 'assets', 'sitemap'], true)) {
-            return [$data, t('这个地址被系统占用了')];
+            return [$data, t('That address is reserved')];
         }
 
         return [$data, null];
@@ -307,7 +307,7 @@ class Controller
     {
         $token = $_POST['_csrf'] ?? null;
         if (!is_string($token) || !Csrf::validate($token)) {
-            Response::error(400, t('请求无效，请重试'));
+            Response::error(400, t('Invalid request, try again'));
         }
     }
 

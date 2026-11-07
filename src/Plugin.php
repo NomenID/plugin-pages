@@ -21,6 +21,7 @@ class Plugin
 
         Plugins::command('pages:sync', [Store::class, 'sync'], '把 content/ 里还没进库的文档页导入');
 
+        Api::boot();
         Admin::register();
     }
 

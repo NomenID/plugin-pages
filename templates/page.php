@@ -4,12 +4,12 @@ $current = (string)$page['slug'];
 ?>
 <div class="docs-layout">
     <aside class="docs-nav">
-        <a class="docs-nav__home" href="<?= htmlspecialchars($base) ?>"><?= t('全部文档') ?></a>
+        <a class="docs-nav__home" href="<?= htmlspecialchars($base) ?>"><?= t('All docs') ?></a>
         <ul>
             <?php foreach ($pages as $item): ?>
                 <li<?= $item['slug'] === $current ? ' class="is-current"' : '' ?>>
                     <a href="<?= htmlspecialchars($base . '/' . $item['slug']) ?>"><?= htmlspecialchars((string)$item['title']) ?></a>
-                    <?php if ((int)$item['status'] === 0): ?><span class="docs-badge"><?= t('草稿') ?></span><?php endif; ?>
+                    <?php if ((int)$item['status'] === 0): ?><span class="docs-badge"><?= t('Draft') ?></span><?php endif; ?>
                 </li>
             <?php endforeach; ?>
         </ul>
@@ -20,12 +20,12 @@ $current = (string)$page['slug'];
             <h1><?= htmlspecialchars((string)$page['title']) ?></h1>
             <div class="docs-meta">
                 <?php if (!empty($page['updated_at'])): ?>
-                    <span><?= t('更新于 {:date}', ['date' => substr((string)$page['updated_at'], 0, 10)]) ?></span>
+                    <span><?= t('Updated {:date}', ['date' => substr((string)$page['updated_at'], 0, 10)]) ?></span>
                 <?php endif; ?>
-                <?php if ((int)$page['status'] === 0): ?><span class="docs-badge"><?= t('草稿') ?></span><?php endif; ?>
+                <?php if ((int)$page['status'] === 0): ?><span class="docs-badge"><?= t('Draft') ?></span><?php endif; ?>
                 <?php if ($isAdmin): ?>
-                    <a href="<?= htmlspecialchars($base . '/' . $page['slug'] . '/edit') ?>"><?= t('编辑') ?></a>
-                    <a href="/admin/logs?target=<?= urlencode($current) ?>"><?= t('页面日志') ?></a>
+                    <a href="<?= htmlspecialchars($base . '/' . $page['slug'] . '/edit') ?>"><?= t('Edit') ?></a>
+                    <a href="/admin/logs?target=<?= urlencode($current) ?>"><?= t('Page log') ?></a>
                 <?php endif; ?>
             </div>
         </div>
