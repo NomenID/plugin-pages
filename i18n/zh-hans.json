@@ -7,7 +7,7 @@
     "Draft": "草稿",
     "Edit": "编辑",
     "Edit: {:title}": "编辑：{:title}",
-    "In-site documentation: write guides inside Nomen, no separate docs site needed": "站内文档页面：在 Nomen 里写指南，不用另建文档站",
+    "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "站内文档页面：在 {:sitename} 里写指南，不用另建文档站",
     "Install, integrate, and extend Nomen.": "Nomen 的安装、接入与扩展指南。",
     "Lowercase letters, digits, and hyphens; leave blank to generate one from the title.": "小写字母、数字和连字符；留空会从标题生成。",
     "New page": "新建页面",
@@ -27,5 +27,5 @@
     "Title": "标题",
     "Title is required": "标题不能为空",
     "Updated {:date}": "更新于 {:date}",
-    "Write guides in Nomen, edited by admins in-site": "在 Nomen 里写指南，管理员在站内编辑"
+    "Write guides in {:sitename}, edited by admins in-site": "在 {:sitename} 里写指南，管理员在站内编辑"
 }

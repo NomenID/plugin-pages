@@ -1,7 +1,7 @@
 {
     "name": "Pages",
     "version": "1.0.0",
-    "description": "In-site documentation: write guides inside Nomen, no separate docs site needed",
+    "description": "In-site documentation: write guides inside {:sitename}, no separate docs site needed",
     "license": "GPL-3.0-only",
     "author": [
         "Yunyun"
@@ -16,7 +16,7 @@
         "docs": {
             "path": "/w",
             "title": "站内文档",
-            "description": "Write guides in Nomen, edited by admins in-site",
+            "description": "Write guides in {:sitename}, edited by admins in-site",
             "access": "public",
             "config": "base_path"
         }
