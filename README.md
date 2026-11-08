@@ -64,4 +64,4 @@ Pages 是独立项目，不属于 Nomen 本体，按 GPLv3 单独发布：
 
 GPL-3.0-only，协议全文见 [LICENSE](LICENSE)。
 
-Copyright (C) 2025-2026 Yunyun
+Copyright (C) 2025-2026 Yunyun (Wang Yaoze)
