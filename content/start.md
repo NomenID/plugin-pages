@@ -13,9 +13,9 @@ Nomen 是自由软件，源码在 GitHub：[NomenID/Nomen](https://github.com/No
 
 安装、接入、插件和皮肤这些文档维护在项目官方站：
 
-- [Nomen 官方站](https://nomen.caellab.com/)，文档从 [概览](https://nomen.caellab.com/w/start) 看起
-- [安装与升级](https://nomen.caellab.com/w/install)
-- [应用接入](https://nomen.caellab.com/w/oauth)（让别的站点用 Nomen 登录）
+- [Nomen 官方站](https://nomenid.org/)，文档从 [概览](https://nomenid.org/w/start) 看起
+- [安装与升级](https://nomenid.org/w/install)
+- [应用接入](https://nomenid.org/w/oauth)（让别的站点用 Nomen 登录）
 
 ## 这个站自己的页面
 

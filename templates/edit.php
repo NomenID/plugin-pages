@@ -4,7 +4,7 @@
  * Licensed under the GNU General Public License, version 3 only, with
  * additional attribution terms in the NOTICE file.
  * Source: https://github.com/NomenID/plugin-pages
- * Project: https://nomen.caellab.com/w/plugin-pages
+ * Project: https://nomenid.org/w/plugin-pages
  */
 
 /** @var array $page @var bool $isNew @var string|null $error @var string $base */
