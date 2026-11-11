@@ -2,7 +2,7 @@
 
 在 Nomen 里写文档页面。管理员直接在站内新建、编辑、发布，不需要另建文档站。
 
-Pages 是独立项目，不属于 Nomen 本体，按 GPLv3 单独发布：
+Pages 是独立项目，不属于 Nomen 本体，按 Apache-2.0 单独发布：
 <https://github.com/NomenID/plugin-pages>。
 
 ## 安装
@@ -26,6 +26,32 @@ Pages 是独立项目，不属于 Nomen 本体，按 GPLv3 单独发布：
 ## 地址
 
 `base_path` 可以改成 `/docs`、`/wiki` 之类。改完直接生效，不用清缓存；如果页脚有指向文档的链接（`config/brand.php` 的 `footer_links`），记得一起改。页面自己的地址是 `base_path + '/' + slug`，slug 只能用小写字母、数字和连字符。
+
+**slug 可以带层级**：`local-docs/install` 就是 `/w/local-docs/install`。访问目录地址（`/w/local-docs`）时，
+先找该目录的 `index` 页；没有就按侧边栏菜单的顺序跳到第一条，再没有就按排序取第一条子页面。
+
+## 侧边栏
+
+侧边栏按目录配置，一个目录一份，后台「内容 → 目录」里编辑。格式是一行一个条目：
+
+```
+概览 | local-docs/index
+  安装 | local-docs/install
+  升级 | local-docs/upgrade
+  内部草稿 | local-docs/draft | hide
+```
+
+缩进两个空格表示下一级；第三列写 `hide` 就不在公开页面显示；目标可以写页面 slug，也可以写完整网址。
+**没挂菜单的目录不显示侧边栏**，正文自动占满。每个目录独立配置，子目录可以有自己的菜单。
+
+## 从目录导入
+
+```
+php bin/nomen plugins pages:import docs --prefix=local-docs
+```
+
+把目录里的 Markdown 按相对路径导成页面（`docs/install.md` → `local-docs/install`，目录根的 `README.md`
+→ `local-docs/index`），只补缺、不覆盖库里改过的页面。适合把发布包里的 `docs/` 挂成站内文档。
 
 ## Markdown
 
@@ -62,6 +88,6 @@ Pages 是独立项目，不属于 Nomen 本体，按 GPLv3 单独发布：
 
 ## 许可
 
-GPL-3.0-only，协议全文见 [LICENSE](LICENSE)。
+Apache-2.0，协议全文见 [LICENSE](LICENSE)。
 
 Copyright (C) 2025-2026 Yunyun (Wang Yaoze)

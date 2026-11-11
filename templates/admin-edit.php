@@ -1,8 +1,8 @@
 <?php
 /*
  * Copyright (c) 2025-2026 Yunyun (Wang Yaoze)
- * Licensed under the GNU General Public License, version 3 only.
- * Attribution requests are in the NOTICE file.
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file in this repository for the full text.
  * Source: https://github.com/NomenID/plugin-pages
  * Project: https://nomenid.org/w/plugin-pages
  */
@@ -17,7 +17,7 @@
  */
 $action = $isNew
     ? $base . '/new'
-    : $base . '/' . rawurlencode((string)$page['slug']) . '/edit';
+    : $base . '/' . implode('/', array_map('rawurlencode', explode('/', (string)$page['slug']))) . '/edit';
 $cancel = '/admin/content?tab=all';
 ?>
 <?php if ($error !== ''): ?>

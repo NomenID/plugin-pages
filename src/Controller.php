@@ -1,8 +1,8 @@
 <?php
 /*
  * Copyright (c) 2025-2026 Yunyun (Wang Yaoze)
- * Licensed under the GNU General Public License, version 3 only.
- * Attribution requests are in the NOTICE file.
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file in this repository for the full text.
  * Source: https://github.com/NomenID/plugin-pages
  * Project: https://nomenid.org/w/plugin-pages
  */
@@ -34,22 +34,55 @@ class Controller
 
     public static function show(string $slug): void
     {
+        $path = trim($slug, '/');
+        if ($path === '') {
+            self::index();
+            return;
+        }
+
         $isAdmin = Router::isAdmin();
-        $page = Store::find($slug, $isAdmin);
+        $page = Store::find($path, $isAdmin);
 
         if ($page === null) {
-            Response::error(404);
-            return;
+            // 目录地址：先认 <目录>/index，再回退到目录第一条
+            $page = Store::find($path . '/index', $isAdmin);
+            if ($page === null) {
+                $first = Store::firstInDirectory($path, $isAdmin);
+                if ($first !== null && $first !== $path) {
+                    Response::redirect(Plugin::basePath() . '/' . $first);
+                    return;
+                }
+                Response::error(404);
+                return;
+            }
         }
 
         self::render('page', [
             'page' => $page,
             'pages' => Store::all($isAdmin),
+            'menu' => Store::menuFor((string)$page['slug']),
             'base' => Plugin::basePath(),
             'isAdmin' => $isAdmin,
             'article' => Markdown::render((string)$page['body']),
             'notice' => Session::getFlash('pages_success'),
         ], (string)$page['title']);
+    }
+
+    /** 后台保存某个目录的侧边栏 */
+    public static function saveNav(): void
+    {
+        self::requireCsrf();
+
+        $section = trim((string)($_POST['section'] ?? ''), '/');
+        $items = Menu::parse((string)($_POST['items'] ?? ''));
+        Store::saveMenu(
+            $section,
+            (string)json_encode($items, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+            !empty($_POST['enabled'])
+        );
+
+        Session::flash('pages_success', t('Page saved'));
+        Response::redirect('/admin/content?tab=nav&section=' . rawurlencode($section));
     }
 
     public static function create(): void

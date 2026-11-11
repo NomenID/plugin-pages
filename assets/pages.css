@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2025-2026 Yunyun (Wang Yaoze)
- * Licensed under the GNU General Public License, version 3 only.
- * Attribution requests are in the NOTICE file.
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file in this repository for the full text.
  * Source: https://github.com/NomenID/plugin-pages
  * Project: https://nomenid.org/w/plugin-pages
  */
@@ -389,4 +389,40 @@
     .docs-form__row {
         grid-template-columns: 1fr;
     }
+}
+
+/* 目录侧边栏：没挂菜单的页面不显示侧栏，正文占满 */
+.docs-layout--solo {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.docs-nav__list,
+.docs-nav__list ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-left: 0;
+}
+
+.docs-nav__list li {
+    display: block;
+    padding: 5px 0 5px 14px;
+    margin-left: -1px;
+    border-left: 2px solid transparent;
+}
+
+.docs-nav__list li ul {
+    margin: 2px 0 2px 6px;
+    padding-left: 8px;
+    border-left: 1px solid var(--color-border);
+}
+
+.docs-nav__list a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.docs-nav__list li.is-current > a {
+    color: var(--color-primary);
+    font-weight: 600;
 }

@@ -1,11 +1,12 @@
 <?php
 /*
  * Copyright (c) 2025-2026 Yunyun (Wang Yaoze)
- * Licensed under the GNU General Public License, version 3 only.
- * Attribution requests are in the NOTICE file.
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file in this repository for the full text.
  * Source: https://github.com/NomenID/plugin-pages
  * Project: https://nomenid.org/w/plugin-pages
  */
+
 
 namespace Nomen\Plugin\Pages;
 
@@ -74,6 +75,23 @@ class Store
         foreach (Sql::splitStatements($ddl) as $statement) {
             $db->exec($statement);
         }
+
+        $menuDdl = $dialect->isSqlite()
+            ? 'CREATE TABLE IF NOT EXISTS page_menus (
+                path TEXT PRIMARY KEY,
+                items TEXT NOT NULL DEFAULT \'\',
+                enabled INTEGER NOT NULL DEFAULT 1,
+                updated_at TEXT NOT NULL DEFAULT \'\'
+            )'
+            : 'CREATE TABLE IF NOT EXISTS `page_menus` (
+                `path` VARCHAR(191) NOT NULL,
+                `items` MEDIUMTEXT NOT NULL,
+                `enabled` TINYINT UNSIGNED NOT NULL DEFAULT 1,
+                `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (`path`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci';
+
+        $db->exec($menuDdl);
 
         self::$ready = true;
 
@@ -171,10 +189,17 @@ class Store
     public static function makeSlug(string $value): string
     {
         $value = strtolower(trim($value));
-        $value = preg_replace('/[^a-z0-9-]+/', '-', $value) ?? '';
-        $value = trim($value, '-');
+        $segments = [];
 
-        return substr($value, 0, 100);
+        foreach (explode('/', $value) as $segment) {
+            $segment = preg_replace('/[^a-z0-9-]+/', '-', $segment) ?? '';
+            $segment = trim($segment, '-');
+            if ($segment !== '') {
+                $segments[] = $segment;
+            }
+        }
+
+        return substr(implode('/', $segments), 0, 191);
     }
 
     /** 只补缺，不覆盖已经在库里改过的页面。 */
@@ -237,5 +262,224 @@ class Store
         }
 
         return [$meta, $m[2]];
+    }
+
+    /**
+     * 目录清单：从已有 slug 推导出来。'' 表示根目录（/w 下面那一层）。
+     *
+     * @return array<int, string>
+     */
+    public static function sections(bool $includeDrafts = true): array
+    {
+        $out = [''];
+
+        foreach (self::all($includeDrafts) as $page) {
+            $dir = (string)$page['slug'];
+            while (($pos = strrpos($dir, '/')) !== false) {
+                $dir = substr($dir, 0, $pos);
+                $out[$dir] = $dir;
+            }
+        }
+
+        sort($out);
+
+        return array_values(array_unique($out));
+    }
+
+    /** 某个目录挂了菜单就返回条目树，没挂返回 null */
+    public static function menu(string $path): ?array
+    {
+        $row = self::menuRow($path);
+        if ($row === null || (int)$row['enabled'] !== 1) {
+            return null;
+        }
+
+        $items = json_decode((string)$row['items'], true);
+
+        return is_array($items) ? $items : null;
+    }
+
+    /** 后台编辑用：不管启用与否都取出来 */
+    public static function menuRow(string $path): ?array
+    {
+        $stmt = self::db()->prepare('SELECT * FROM page_menus WHERE path = :p LIMIT 1');
+        $stmt->execute([':p' => $path]);
+        $row = $stmt->fetch();
+
+        return $row ?: null;
+    }
+
+    public static function saveMenu(string $path, string $items, bool $enabled): void
+    {
+        $db = self::db();
+        $now = Database::dialectFor($db)->isSqlite() ? "datetime('now','localtime')" : 'NOW()';
+        $params = [':p' => $path, ':items' => $items, ':enabled' => $enabled ? 1 : 0];
+
+        if (self::menuRow($path) !== null) {
+            $stmt = $db->prepare('UPDATE page_menus SET items = :items, enabled = :enabled, updated_at = ' . $now . ' WHERE path = :p');
+            $stmt->execute($params);
+            return;
+        }
+
+        $stmt = $db->prepare('INSERT INTO page_menus (path, items, enabled) VALUES (:p, :items, :enabled)');
+        $stmt->execute($params);
+    }
+
+    /** 页面所在目录（含自己那一层）向上找第一份挂好的菜单 */
+    public static function menuFor(string $slug): ?array
+    {
+        $dir = str_contains($slug, '/') ? substr($slug, 0, strrpos($slug, '/')) : '';
+
+        while (true) {
+            $menu = self::menu($dir);
+            if ($menu !== null) {
+                return $menu;
+            }
+            if ($dir === '') {
+                return null;
+            }
+            $dir = str_contains($dir, '/') ? substr($dir, 0, strrpos($dir, '/')) : '';
+        }
+    }
+
+    /** 目录首页：先找 <目录>/index，再按菜单顺序 / 排序取第一条 */
+    public static function firstInDirectory(string $dir, bool $includeDrafts = false): ?string
+    {
+        $dir = trim($dir, '/');
+        $prefix = $dir === '' ? '' : $dir . '/';
+
+        if (self::find($prefix . 'index', $includeDrafts) !== null) {
+            return $prefix . 'index';
+        }
+
+        $menu = $dir === '' ? null : self::menu($dir);
+        if ($menu !== null) {
+            foreach (self::menuHrefs($menu) as $href) {
+                if (str_starts_with($href, $prefix) && self::find($href, $includeDrafts) !== null) {
+                    return $href;
+                }
+            }
+        }
+
+        foreach (self::all($includeDrafts) as $page) {
+            $slug = (string)$page['slug'];
+            if (!str_starts_with($slug, $prefix)) {
+                continue;
+            }
+            $rest = substr($slug, strlen($prefix));
+            if ($rest !== '' && !str_contains($rest, '/')) {
+                return $slug;
+            }
+        }
+
+        return null;
+    }
+
+    /** @return array<int, string> */
+    private static function menuHrefs(array $items): array
+    {
+        $out = [];
+        foreach ($items as $item) {
+            $href = (string)($item['href'] ?? '');
+            if ($href !== '' && !preg_match('#^https?://#i', $href)) {
+                $out[] = ltrim($href, '/');
+            }
+            $out = array_merge($out, self::menuHrefs($item['children'] ?? []));
+        }
+
+        return $out;
+    }
+
+    /**
+     * 从目录导入 Markdown：`install.md` → `<prefix>/install`，
+     * 目录根的 README.md → `<prefix>/index`。只补缺，不覆盖库里改过的页面。
+     */
+    public static function import(string $dir, string $prefix): int
+    {
+        $base = realpath($dir);
+        if ($base === false || !is_dir($base)) {
+            return -1;
+        }
+
+        $prefix = trim($prefix, '/');
+        $files = [];
+        $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($base, \FilesystemIterator::SKIP_DOTS));
+        foreach ($it as $file) {
+            if ($file->isFile() && strtolower($file->getExtension()) === 'md') {
+                $files[] = str_replace('\\', '/', substr($file->getPathname(), strlen($base) + 1));
+            }
+        }
+        sort($files);
+
+        $inserted = 0;
+        foreach ($files as $rel) {
+            $slug = strtolower(preg_replace('/\.md$/i', '', $rel) ?? $rel);
+            $slug = $slug === 'readme' ? 'index' : $slug;
+            $slug = self::makeSlug($prefix . '/' . $slug);
+            if ($slug === '' || $slug === $prefix) {
+                continue;
+            }
+
+            [$meta, $body] = self::frontmatter((string)file_get_contents($base . '/' . $rel));
+            $title = trim((string)($meta['title'] ?? basename($rel, '.md')));
+            if ($title === '') {
+                continue;
+            }
+
+            $stmt = self::db()->prepare(
+                Database::dialectFor(self::db())->insertIgnore(
+                    'INSERT IGNORE INTO pages (slug, title, summary, body, status, sort_order)
+                     VALUES (:slug, :title, :summary, :body, 1, :sort_order)'
+                )
+            );
+            $stmt->execute([
+                ':slug' => $slug,
+                ':title' => $title,
+                ':summary' => trim((string)($meta['summary'] ?? '')),
+                ':body' => $body,
+                ':sort_order' => (int)($meta['sort'] ?? 0),
+            ]);
+            $inserted += $stmt->rowCount();
+        }
+
+        return $inserted;
+    }
+
+    /** bin/nomen plugins pages:import <目录> [--prefix=local-docs] */
+    public static function importCommand(): int
+    {
+        $argv = $_SERVER['argv'] ?? [];
+        $args = [];
+        foreach ($argv as $i => $value) {
+            if ($value === 'pages:import') {
+                $args = array_slice($argv, $i + 1);
+                break;
+            }
+        }
+
+        $dir = '';
+        $prefix = 'local-docs';
+        foreach ($args as $arg) {
+            if (str_starts_with($arg, '--prefix=')) {
+                $prefix = substr($arg, 9);
+            } elseif (!str_starts_with($arg, '-')) {
+                $dir = $arg;
+            }
+        }
+
+        if ($dir === '') {
+            fwrite(STDERR, '用法：php bin/nomen plugins pages:import <目录> [--prefix=local-docs]' . PHP_EOL);
+            return 1;
+        }
+
+        $count = self::import($dir, $prefix);
+        if ($count < 0) {
+            fwrite(STDERR, '目录不存在：' . $dir . PHP_EOL);
+            return 1;
+        }
+
+        echo '导入 ' . $count . ' 篇（前缀 ' . trim($prefix, '/') . '）' . PHP_EOL;
+
+        return 0;
     }
 }

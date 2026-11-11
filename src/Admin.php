@@ -1,8 +1,8 @@
 <?php
 /*
  * Copyright (c) 2025-2026 Yunyun (Wang Yaoze)
- * Licensed under the GNU General Public License, version 3 only.
- * Attribution requests are in the NOTICE file.
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file in this repository for the full text.
  * Source: https://github.com/NomenID/plugin-pages
  * Project: https://nomenid.org/w/plugin-pages
  */
@@ -29,6 +29,7 @@ class Admin
                 ['id' => 'all', 'label' => '全部', 'handler' => static fn(): string => self::renderList('all')],
                 ['id' => 'published', 'label' => '已发布', 'handler' => static fn(): string => self::renderList('published')],
                 ['id' => 'draft', 'label' => '草稿', 'handler' => static fn(): string => self::renderList('draft')],
+                ['id' => 'nav', 'label' => '目录', 'handler' => static fn(): string => self::renderNav()],
             ],
         ]);
     }
@@ -79,9 +80,32 @@ class Admin
         ]);
     }
 
-    private static function renderEditor(array $page, bool $isNew = false): string
+    /** 每个目录一份侧边栏；没挂菜单的目录不显示侧边栏 */
+    public static function renderNav(): string
     {
-        return self::view('admin-edit', [
+        $sections = Store::sections(true);
+        $section = trim((string)($_GET['section'] ?? ''), '/');
+        if (!in_array($section, $sections, true)) {
+            $section = '';
+        }
+
+        $row = Store::menuRow($section);
+        $items = $row === null ? null : json_decode((string)$row['items'], true);
+
+        return self::view('admin-nav', [
+            'sections' => $sections,
+            'section'  => $section,
+            'text'     => Menu::textOf(is_array($items) ? $items : null),
+            'enabled'  => $row === null ? false : (int)$row['enabled'] === 1,
+            'base'     => Plugin::basePath(),
+            'csrf'     => Csrf::field(),
+            'pages'    => Store::all(true),
+            'notice'   => (string)(Session::getFlash('pages_success') ?: ''),
+        ]);
+    }
+
+    private static function renderEditor(array $page, bool $isNew = false): string
+    {        return self::view('admin-edit', [
             'page'  => $page,
             'isNew' => $isNew,
             'base'  => Plugin::basePath(),

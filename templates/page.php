@@ -1,8 +1,8 @@
 <?php
 /*
  * Copyright (c) 2025-2026 Yunyun (Wang Yaoze)
- * Licensed under the GNU General Public License, version 3 only.
- * Attribution requests are in the NOTICE file.
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file in this repository for the full text.
  * Source: https://github.com/NomenID/plugin-pages
  * Project: https://nomenid.org/w/plugin-pages
  */
@@ -10,18 +10,13 @@
 /** @var array $page @var array $pages @var string $base @var bool $isAdmin @var string $article @var string|null $notice */
 $current = (string)$page['slug'];
 ?>
-<div class="docs-layout">
-    <aside class="docs-nav">
-        <a class="docs-nav__home" href="<?= htmlspecialchars($base) ?>"><?= t('All docs') ?></a>
-        <ul>
-            <?php foreach ($pages as $item): ?>
-                <li<?= $item['slug'] === $current ? ' class="is-current"' : '' ?>>
-                    <a href="<?= htmlspecialchars($base . '/' . $item['slug']) ?>"><?= htmlspecialchars((string)$item['title']) ?></a>
-                    <?php if ((int)$item['status'] === 0): ?><span class="docs-badge"><?= t('Draft') ?></span><?php endif; ?>
-                </li>
-            <?php endforeach; ?>
-        </ul>
-    </aside>
+<div class="docs-layout<?= empty($menu) ? ' docs-layout--solo' : '' ?>">
+    <?php if (!empty($menu)): ?>
+        <aside class="docs-nav">
+            <a class="docs-nav__home" href="<?= htmlspecialchars($base) ?>"><?= t('All docs') ?></a>
+            <?= \Nomen\Plugin\Pages\Menu::render($menu, $current, $base) ?>
+        </aside>
+    <?php endif; ?>
 
     <article class="docs-article">
         <div class="docs-head">
