@@ -473,6 +473,7 @@ class Store
             }
 
             [$meta, $body] = self::frontmatter((string)file_get_contents($base . '/' . $rel));
+            $body = self::rewriteLinks($body, $prefix);
             $title = trim((string)($meta['title'] ?? basename($rel, '.md')));
             if ($title === '') {
                 continue;
@@ -508,6 +509,18 @@ class Store
         }
 
         return $inserted;
+    }
+
+    /** 把 Markdown 里的相对 .md 链接改成站内地址，导入后不会变成死链 */
+    private static function rewriteLinks(string $markdown, string $prefix): string
+    {
+        $base = Plugin::basePath() . '/' . trim($prefix, '/') . '/';
+
+        return (string)preg_replace_callback(
+            '/\]\((?!https?:|\/|#|mailto:)([^)\s#]+?)\.md(#[^)\s]*)?\)/u',
+            static fn(array $m): string => '](' . $base . ltrim($m[1], './') . ($m[2] ?? '') . ')',
+            $markdown
+        );
     }
 
     /** bin/nomen plugins pages:import <目录> [--prefix=local-docs] [--update] */
