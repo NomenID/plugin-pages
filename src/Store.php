@@ -247,6 +247,58 @@ class Store
         return $inserted;
     }
 
+    /**
+     * 文档首页的条目：顶层页面各自一项，子目录合成一项（用它的 index 页当标题）。
+     *
+     * @return array<int, array{type: string, title: string, summary: string, status: int, count: int, href: string}>
+     */
+    public static function indexGroups(bool $includeDrafts = false): array
+    {
+        $groups = [];
+
+        foreach (self::all($includeDrafts) as $page) {
+            $slug = (string)$page['slug'];
+            $pos = strpos($slug, '/');
+
+            if ($pos === false) {
+                $groups['p:' . $slug] = [
+                    'type' => 'page',
+                    'title' => (string)$page['title'],
+                    'summary' => (string)$page['summary'],
+                    'status' => (int)$page['status'],
+                    'count' => 1,
+                    'href' => $slug,
+                    'sort' => (int)$page['sort_order'],
+                ];
+                continue;
+            }
+
+            $dir = substr($slug, 0, $pos);
+            $key = 'd:' . $dir;
+            if (!isset($groups[$key])) {
+                $groups[$key] = [
+                    'type' => 'dir', 'title' => $dir, 'summary' => '', 'status' => 1,
+                    'count' => 0, 'href' => $dir, 'sort' => PHP_INT_MAX,
+                ];
+            }
+            $groups[$key]['count']++;
+
+            if ($slug === $dir . '/index') {
+                $groups[$key]['title'] = (string)$page['title'];
+                $groups[$key]['summary'] = (string)$page['summary'];
+                $groups[$key]['status'] = (int)$page['status'];
+                $groups[$key]['sort'] = (int)$page['sort_order'];
+            } else {
+                $groups[$key]['sort'] = min($groups[$key]['sort'], (int)$page['sort_order']);
+            }
+        }
+
+        $out = array_values($groups);
+        usort($out, static fn(array $a, array $b): int => [$a['sort'], $a['title']] <=> [$b['sort'], $b['title']]);
+
+        return $out;
+    }
+
     /** @return array{0: array<string, string>, 1: string} */
     private static function frontmatter(string $raw): array
     {

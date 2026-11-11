@@ -25,7 +25,7 @@ class Controller
         $base = Plugin::basePath();
 
         self::render('index', [
-            'pages' => Store::all($isAdmin),
+            'groups' => Store::indexGroups($isAdmin),
             'base' => $base,
             'isAdmin' => $isAdmin,
             'notice' => Session::getFlash('pages_success'),

@@ -23,16 +23,19 @@
 
     <p class="docs-lead"><?= t('Install, integrate, and extend Nomen.') ?></p>
 
-    <?php if ($pages === []): ?>
+    <?php if ($groups === []): ?>
         <p class="docs-empty"><?= t('No pages yet.') ?></p>
     <?php else: ?>
         <ul class="docs-list">
-            <?php foreach ($pages as $page): ?>
+            <?php foreach ($groups as $item): ?>
                 <li>
-                    <a class="docs-list__title" href="<?= htmlspecialchars($base . '/' . $page['slug']) ?>"><?= htmlspecialchars((string)$page['title']) ?></a>
-                    <?php if ((int)$page['status'] === 0): ?><span class="docs-badge"><?= t('Draft') ?></span><?php endif; ?>
-                    <?php if ((string)$page['summary'] !== ''): ?>
-                        <span class="docs-list__summary"><?= htmlspecialchars((string)$page['summary']) ?></span>
+                    <a class="docs-list__title" href="<?= htmlspecialchars($base . '/' . $item['href']) ?>"><?= htmlspecialchars((string)$item['title']) ?></a>
+                    <?php if ($item['type'] === 'dir'): ?>
+                        <span class="docs-list__count">(<?= (int)$item['count'] ?>)</span>
+                    <?php endif; ?>
+                    <?php if ((int)$item['status'] === 0): ?><span class="docs-badge"><?= t('Draft') ?></span><?php endif; ?>
+                    <?php if ((string)$item['summary'] !== ''): ?>
+                        <span class="docs-list__summary"><?= htmlspecialchars((string)$item['summary']) ?></span>
                     <?php endif; ?>
                 </li>
             <?php endforeach; ?>
