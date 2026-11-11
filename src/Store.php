@@ -394,7 +394,7 @@ class Store
      * 从目录导入 Markdown：`install.md` → `<prefix>/install`，
      * 目录根的 README.md → `<prefix>/index`。只补缺，不覆盖库里改过的页面。
      */
-    public static function import(string $dir, string $prefix): int
+    public static function import(string $dir, string $prefix, bool $update = false): int
     {
         $base = realpath($dir);
         if ($base === false || !is_dir($base)) {
@@ -426,26 +426,39 @@ class Store
                 continue;
             }
 
+            $params = [
+                ':slug' => $slug,
+                ':title' => $title,
+                ':summary' => trim((string)($meta['summary'] ?? '')),
+                ':body' => $body,
+                ':sort_order' => (int)($meta['sort'] ?? 0),
+            ];
+
+            if ($update && self::find($slug, true) !== null) {
+                $stmt = self::db()->prepare(
+                    'UPDATE pages SET title = :title, summary = :summary, body = :body,
+                            sort_order = :sort_order, updated_at = NOW()
+                     WHERE slug = :slug'
+                );
+                $stmt->execute($params);
+                $inserted += $stmt->rowCount();
+                continue;
+            }
+
             $stmt = self::db()->prepare(
                 Database::dialectFor(self::db())->insertIgnore(
                     'INSERT IGNORE INTO pages (slug, title, summary, body, status, sort_order)
                      VALUES (:slug, :title, :summary, :body, 1, :sort_order)'
                 )
             );
-            $stmt->execute([
-                ':slug' => $slug,
-                ':title' => $title,
-                ':summary' => trim((string)($meta['summary'] ?? '')),
-                ':body' => $body,
-                ':sort_order' => (int)($meta['sort'] ?? 0),
-            ]);
+            $stmt->execute($params);
             $inserted += $stmt->rowCount();
         }
 
         return $inserted;
     }
 
-    /** bin/nomen plugins pages:import <目录> [--prefix=local-docs] */
+    /** bin/nomen plugins pages:import <目录> [--prefix=local-docs] [--update] */
     public static function importCommand(): int
     {
         $argv = $_SERVER['argv'] ?? [];
@@ -459,20 +472,23 @@ class Store
 
         $dir = '';
         $prefix = 'local-docs';
+        $update = false;
         foreach ($args as $arg) {
             if (str_starts_with($arg, '--prefix=')) {
                 $prefix = substr($arg, 9);
+            } elseif ($arg === '--update') {
+                $update = true;
             } elseif (!str_starts_with($arg, '-')) {
                 $dir = $arg;
             }
         }
 
         if ($dir === '') {
-            fwrite(STDERR, '用法：php bin/nomen plugins pages:import <目录> [--prefix=local-docs]' . PHP_EOL);
+            fwrite(STDERR, '用法：php bin/nomen plugins pages:import <目录> [--prefix=local-docs] [--update]' . PHP_EOL);
             return 1;
         }
 
-        $count = self::import($dir, $prefix);
+        $count = self::import($dir, $prefix, $update);
         if ($count < 0) {
             fwrite(STDERR, '目录不存在：' . $dir . PHP_EOL);
             return 1;
