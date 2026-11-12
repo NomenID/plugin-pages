@@ -20,16 +20,16 @@ class Admin
     public static function register(): void
     {
         AdminRegistry::page('content', [
-            'title'       => '内容',
-            'description' => '站点文档页面：新建、编辑、发布和删除。',
-            'menu'        => '内容',
-            'group'       => '内容',
+            'title'       => 'Content',
+            'description' => 'Site documentation pages: create, edit, publish and delete.',
+            'menu'        => 'Content',
+            'group'       => 'Content',
             'order'       => 15,
             'tabs'        => [
-                ['id' => 'all', 'label' => '全部', 'handler' => static fn(): string => self::renderList('all')],
-                ['id' => 'published', 'label' => '已发布', 'handler' => static fn(): string => self::renderList('published')],
-                ['id' => 'draft', 'label' => '草稿', 'handler' => static fn(): string => self::renderList('draft')],
-                ['id' => 'nav', 'label' => '目录', 'handler' => static fn(): string => self::renderNav()],
+                ['id' => 'all', 'label' => 'All', 'handler' => static fn(): string => self::renderList('all')],
+                ['id' => 'published', 'label' => 'Published', 'handler' => static fn(): string => self::renderList('published')],
+                ['id' => 'draft', 'label' => 'Drafts', 'handler' => static fn(): string => self::renderList('draft')],
+                ['id' => 'nav', 'label' => 'Sidebars', 'handler' => static fn(): string => self::renderNav()],
             ],
         ]);
     }
