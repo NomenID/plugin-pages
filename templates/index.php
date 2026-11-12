@@ -23,6 +23,14 @@
 
     <p class="docs-lead"><?= t('Install, integrate, and extend Nomen.') ?></p>
 
+    <?php $searchPath = \Nomen\Src\Plugins::mountUrl('search'); ?>
+    <?php if ($searchPath !== null): ?>
+        <form class="docs-search" method="get" action="<?= htmlspecialchars($searchPath) ?>" role="search">
+            <input type="search" name="q" value="" placeholder="<?= t('Search') ?>" aria-label="<?= t('Search') ?>">
+            <button type="submit"><?= t('Search') ?></button>
+        </form>
+    <?php endif; ?>
+
     <?php if ($groups === []): ?>
         <p class="docs-empty"><?= t('No pages yet.') ?></p>
     <?php else: ?>
