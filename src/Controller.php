@@ -57,10 +57,13 @@ class Controller
             }
         }
 
+        $sidebar = Store::sidebarFor((string)$page['slug'], $isAdmin);
+
         self::render('page', [
             'page' => $page,
             'pages' => Store::all($isAdmin),
-            'menu' => Store::menuFor((string)$page['slug']),
+            'menu' => $sidebar['items'] ?? null,
+            'menuMode' => $sidebar['mode'] ?? 'manual',
             'base' => Plugin::basePath(),
             'isAdmin' => $isAdmin,
             'article' => Markdown::render((string)$page['body']),
@@ -75,11 +78,17 @@ class Controller
 
         $section = trim((string)($_POST['section'] ?? ''), '/');
         $items = Menu::parse((string)($_POST['items'] ?? ''));
-        Store::saveMenu(
-            $section,
-            (string)json_encode($items, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-            !empty($_POST['enabled'])
-        );
+        $sort = trim((string)($_POST['sort_order'] ?? ''));
+
+        Store::saveMenu($section, [
+            'title' => mb_substr(trim((string)($_POST['title'] ?? '')), 0, 255),
+            'summary' => mb_substr(trim((string)($_POST['summary'] ?? '')), 0, 500),
+            'sort_order' => $sort === '' ? null : (int)$sort,
+            'collapsed' => !empty($_POST['collapsed']),
+            'mode' => ($_POST['mode'] ?? 'manual') === 'auto' ? 'auto' : 'manual',
+            'items' => (string)json_encode($items, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+            'enabled' => !empty($_POST['enabled']),
+        ]);
 
         Session::flash('pages_success', t('Page saved'));
         Response::redirect('/admin/content?tab=nav&section=' . rawurlencode($section));

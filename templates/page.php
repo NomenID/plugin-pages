@@ -7,14 +7,16 @@
  * Project: https://nomenid.org/w/plugin-pages
  */
 
-/** @var array $page @var array $pages @var string $base @var bool $isAdmin @var string $article @var string|null $notice */
+/** @var array $page @var array $pages @var string $base @var bool $isAdmin @var string $article @var string|null $notice @var array|null $menu @var string $menuMode */
 $current = (string)$page['slug'];
 ?>
 <div class="docs-layout<?= empty($menu) ? ' docs-layout--solo' : '' ?>">
     <?php if (!empty($menu)): ?>
         <aside class="docs-nav">
             <a class="docs-nav__home" href="<?= htmlspecialchars($base) ?>"><?= t('All docs') ?></a>
-            <?= \Nomen\Plugin\Pages\Menu::render($menu, $current, $base) ?>
+            <?= ($menuMode ?? 'manual') === 'auto'
+                ? \Nomen\Plugin\Pages\Menu::renderAuto($menu, $current, $base)
+                : \Nomen\Plugin\Pages\Menu::render($menu, $current, $base) ?>
         </aside>
     <?php endif; ?>
 

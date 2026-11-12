@@ -101,6 +101,44 @@ final class Menu
         return $html . '</ul>';
     }
 
+    /**
+     * auto 模式的边栏：有子页的目录折成一组，当前页所在的组强制展开。
+     * 目录标题只负责展开收起，点目录进 index 页靠组内第一条。
+     */
+    public static function renderAuto(array $items, string $current, string $base): string
+    {
+        if ($items === []) {
+            return '';
+        }
+
+        $html = '<ul class="docs-nav__list">';
+        foreach ($items as $item) {
+            if (!empty($item['hidden'])) {
+                continue;
+            }
+
+            $children = $item['children'] ?? [];
+            $href = ltrim((string)$item['href'], '/');
+            $here = $href !== '' && ($current === $href || str_starts_with($current, $href . '/'));
+            $class = $here ? ' class="is-current"' : '';
+
+            $html .= '<li' . $class . '>';
+            if ($children === []) {
+                $url = $base . '/' . $href;
+                $html .= '<a href="' . htmlspecialchars($url) . '">' . htmlspecialchars((string)$item['label']) . '</a>';
+            } else {
+                $open = empty($item['collapsed']) || $here;
+                $html .= '<details' . ($open ? ' open' : '') . '>'
+                    . '<summary>' . htmlspecialchars((string)$item['label']) . '</summary>'
+                    . self::renderAuto($children, $current, $base)
+                    . '</details>';
+            }
+            $html .= '</li>';
+        }
+
+        return $html . '</ul>';
+    }
+
     /** 把树摊平成「缩进文本」，给后台编辑框用 */
     public static function textOf(?array $items): string
     {

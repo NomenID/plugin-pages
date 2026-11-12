@@ -79,12 +79,22 @@ class Store
         $menuDdl = $dialect->isSqlite()
             ? 'CREATE TABLE IF NOT EXISTS page_menus (
                 path TEXT PRIMARY KEY,
+                title TEXT NOT NULL DEFAULT \'\',
+                summary TEXT NOT NULL DEFAULT \'\',
+                sort_order INTEGER DEFAULT NULL,
+                collapsed INTEGER NOT NULL DEFAULT 0,
+                mode TEXT NOT NULL DEFAULT \'manual\',
                 items TEXT NOT NULL DEFAULT \'\',
                 enabled INTEGER NOT NULL DEFAULT 1,
                 updated_at TEXT NOT NULL DEFAULT \'\'
             )'
             : 'CREATE TABLE IF NOT EXISTS `page_menus` (
                 `path` VARCHAR(191) NOT NULL,
+                `title` VARCHAR(255) NOT NULL DEFAULT \'\',
+                `summary` VARCHAR(500) NOT NULL DEFAULT \'\',
+                `sort_order` INT DEFAULT NULL,
+                `collapsed` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+                `mode` VARCHAR(10) NOT NULL DEFAULT \'manual\',
                 `items` MEDIUMTEXT NOT NULL,
                 `enabled` TINYINT UNSIGNED NOT NULL DEFAULT 1,
                 `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -92,6 +102,7 @@ class Store
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci';
 
         $db->exec($menuDdl);
+        self::ensureMenuColumns($db, $dialect);
 
         self::$ready = true;
 
@@ -248,7 +259,7 @@ class Store
     }
 
     /**
-     * 文档首页的条目：顶层页面各自一项，子目录合成一项（用它的 index 页当标题）。
+     * 文档首页的条目：顶层页面各自一项，子目录合成一项（优先用目录记录，其次用 index 页当标题）。
      *
      * @return array<int, array{type: string, title: string, summary: string, status: int, count: int, href: string}>
      */
@@ -277,7 +288,7 @@ class Store
             $key = 'd:' . $dir;
             if (!isset($groups[$key])) {
                 $groups[$key] = [
-                    'type' => 'dir', 'title' => $dir, 'summary' => '', 'status' => 1,
+                    'type' => 'dir', 'title' => self::humanize($dir), 'summary' => '', 'status' => 1,
                     'count' => 0, 'href' => $dir, 'sort' => PHP_INT_MAX,
                 ];
             }
@@ -290,6 +301,25 @@ class Store
                 $groups[$key]['sort'] = (int)$page['sort_order'];
             } else {
                 $groups[$key]['sort'] = min($groups[$key]['sort'], (int)$page['sort_order']);
+            }
+        }
+
+        foreach ($groups as $key => $group) {
+            if ($group['type'] !== 'dir') {
+                continue;
+            }
+            $row = self::menuRow(substr($key, 2));
+            if ($row === null) {
+                continue;
+            }
+            if (trim((string)$row['title']) !== '') {
+                $groups[$key]['title'] = (string)$row['title'];
+            }
+            if (trim((string)$row['summary']) !== '') {
+                $groups[$key]['summary'] = (string)$row['summary'];
+            }
+            if ($row['sort_order'] !== null) {
+                $groups[$key]['sort'] = (int)$row['sort_order'];
             }
         }
 
@@ -333,6 +363,14 @@ class Store
             }
         }
 
+        // 页删光了但目录记录还在，后台也得能进去改
+        foreach (self::db()->query('SELECT path FROM page_menus')->fetchAll(PDO::FETCH_COLUMN) as $path) {
+            $path = trim((string)$path, '/');
+            if ($path !== '') {
+                $out[$path] = $path;
+            }
+        }
+
         sort($out);
 
         return array_values(array_unique($out));
@@ -361,31 +399,62 @@ class Store
         return $row ?: null;
     }
 
-    public static function saveMenu(string $path, string $items, bool $enabled): void
+    public static function saveMenu(string $path, array $fields): void
     {
         $db = self::db();
-        $now = Database::dialectFor($db)->isSqlite() ? "datetime('now','localtime')" : 'NOW()';
-        $params = [':p' => $path, ':items' => $items, ':enabled' => $enabled ? 1 : 0];
+        $params = [
+            ':p' => $path,
+            ':title' => (string)($fields['title'] ?? ''),
+            ':summary' => (string)($fields['summary'] ?? ''),
+            ':sort_order' => $fields['sort_order'] ?? null,
+            ':collapsed' => !empty($fields['collapsed']) ? 1 : 0,
+            ':mode' => ($fields['mode'] ?? 'manual') === 'auto' ? 'auto' : 'manual',
+            ':items' => (string)($fields['items'] ?? ''),
+            ':enabled' => !empty($fields['enabled']) ? 1 : 0,
+        ];
+
+        $assign = 'title = :title, summary = :summary, sort_order = :sort_order, collapsed = :collapsed,'
+            . ' mode = :mode, items = :items, enabled = :enabled';
 
         if (self::menuRow($path) !== null) {
-            $stmt = $db->prepare('UPDATE page_menus SET items = :items, enabled = :enabled, updated_at = ' . $now . ' WHERE path = :p');
+            $stmt = $db->prepare(
+                'UPDATE page_menus SET ' . $assign . ', updated_at = ' . Database::dialectFor($db)->now() . ' WHERE path = :p'
+            );
             $stmt->execute($params);
             return;
         }
 
-        $stmt = $db->prepare('INSERT INTO page_menus (path, items, enabled) VALUES (:p, :items, :enabled)');
+        $stmt = $db->prepare(
+            'INSERT INTO page_menus (path, title, summary, sort_order, collapsed, mode, items, enabled)
+             VALUES (:p, :title, :summary, :sort_order, :collapsed, :mode, :items, :enabled)'
+        );
         $stmt->execute($params);
     }
 
-    /** 页面所在目录（含自己那一层）向上找第一份挂好的菜单 */
-    public static function menuFor(string $slug): ?array
+    /**
+     * 当前页面该用哪份侧边栏：从自己所在目录往上找第一份启用的目录记录。
+     * auto 按 slug 树现场生成，manual 用后台写的条目。
+     *
+     * @return array{path: string, mode: string, items: array}|null
+     */
+    public static function sidebarFor(string $slug, bool $includeDrafts = false): ?array
     {
         $dir = str_contains($slug, '/') ? substr($slug, 0, strrpos($slug, '/')) : '';
 
         while (true) {
-            $menu = self::menu($dir);
-            if ($menu !== null) {
-                return $menu;
+            $row = self::menuRow($dir);
+            if ($row !== null && (int)$row['enabled'] === 1) {
+                if ((string)($row['mode'] ?? 'manual') === 'auto') {
+                    $items = self::autoMenu($dir, $includeDrafts);
+                    if ($items !== []) {
+                        return ['path' => $dir, 'mode' => 'auto', 'items' => $items];
+                    }
+                } else {
+                    $items = json_decode((string)$row['items'], true);
+                    if (is_array($items)) {
+                        return ['path' => $dir, 'mode' => 'manual', 'items' => $items];
+                    }
+                }
             }
             if ($dir === '') {
                 return null;
@@ -402,6 +471,11 @@ class Store
 
         if (self::find($prefix . 'index', $includeDrafts) !== null) {
             return $prefix . 'index';
+        }
+
+        $row = self::menuRow($dir);
+        if ($row !== null && (int)$row['enabled'] === 1 && (string)($row['mode'] ?? 'manual') === 'auto') {
+            return self::firstHref(self::autoMenu($dir, $includeDrafts));
         }
 
         $menu = $dir === '' ? null : self::menu($dir);
@@ -427,6 +501,111 @@ class Store
         return null;
     }
 
+    /**
+     * auto 模式：把某个目录下的页面按 slug 树拼成侧边栏。
+     * 目录标题 / 排序 / 折叠取目录记录，没有就退回 index 页标题和小写连字符转空格。
+     *
+     * @return array<int, array>
+     */
+    public static function autoMenu(string $dir, bool $includeDrafts = false): array
+    {
+        return self::autoTree(trim($dir, '/'), $includeDrafts);
+    }
+
+    /** @return array<int, array> */
+    private static function autoTree(string $dir, bool $includeDrafts): array
+    {
+        $prefix = $dir === '' ? '' : $dir . '/';
+        $items = [];
+        $dirs = [];
+
+        foreach (self::all($includeDrafts) as $page) {
+            $slug = (string)$page['slug'];
+            if ($prefix !== '' && !str_starts_with($slug, $prefix)) {
+                continue;
+            }
+
+            $rest = substr($slug, strlen($prefix));
+            if ($rest === '') {
+                continue;
+            }
+            if (str_contains($rest, '/')) {
+                $dirs[substr($rest, 0, strpos($rest, '/'))] = true;
+                continue;
+            }
+
+            $items[] = [
+                'label' => (string)$page['title'],
+                'href' => $slug,
+                'hidden' => false,
+                'collapsed' => false,
+                'group' => false,
+                'children' => [],
+                'sort' => (int)$page['sort_order'],
+            ];
+        }
+
+        foreach (array_keys($dirs) as $segment) {
+            $path = $prefix . $segment;
+            $children = self::autoTree($path, $includeDrafts);
+            if ($children === []) {
+                continue;
+            }
+
+            $row = self::menuRow($path);
+            $label = $row === null ? '' : trim((string)$row['title']);
+            $summary = $row === null ? '' : trim((string)$row['summary']);
+            $sort = $row === null || $row['sort_order'] === null ? null : (int)$row['sort_order'];
+
+            if ($label === '') {
+                $index = self::find($path . '/index', $includeDrafts);
+                $label = $index !== null ? (string)$index['title'] : self::humanize($segment);
+            }
+            if ($sort === null) {
+                $sort = min(array_map(static fn(array $item): int => $item['sort'], $children));
+            }
+
+            $items[] = [
+                'label' => $label,
+                'summary' => $summary,
+                'href' => $path,
+                'hidden' => false,
+                'collapsed' => $row !== null && (int)$row['collapsed'] === 1,
+                'group' => true,
+                'children' => $children,
+                'sort' => $sort,
+            ];
+        }
+
+        usort($items, static fn(array $a, array $b): int => [$a['sort'], $a['label']] <=> [$b['sort'], $b['label']]);
+
+        return $items;
+    }
+
+    /** @return string|null 自动菜单里第一个可点的页面 */
+    private static function firstHref(array $items): ?string
+    {
+        foreach ($items as $item) {
+            if (!empty($item['children'])) {
+                $found = self::firstHref($item['children']);
+                if ($found !== null) {
+                    return $found;
+                }
+                continue;
+            }
+            if ((string)$item['href'] !== '') {
+                return (string)$item['href'];
+            }
+        }
+
+        return null;
+    }
+
+    private static function humanize(string $segment): string
+    {
+        return ucfirst(str_replace('-', ' ', $segment));
+    }
+
     /** @return array<int, string> */
     private static function menuHrefs(array $items): array
     {
@@ -440,6 +619,42 @@ class Store
         }
 
         return $out;
+    }
+
+    private static function ensureMenuColumns(PDO $db, \Nomen\Src\Db\Dialect $dialect): void
+    {
+        $existing = self::columnsOf($db, $dialect, 'page_menus');
+        $columns = [
+            'title' => "VARCHAR(255) NOT NULL DEFAULT ''",
+            'summary' => "VARCHAR(500) NOT NULL DEFAULT ''",
+            'sort_order' => 'INT DEFAULT NULL',
+            'collapsed' => 'INTEGER NOT NULL DEFAULT 0',
+            'mode' => "VARCHAR(10) NOT NULL DEFAULT 'manual'",
+        ];
+
+        foreach ($columns as $name => $definition) {
+            if (in_array($name, $existing, true)) {
+                continue;
+            }
+            $db->exec('ALTER TABLE page_menus ADD COLUMN ' . $name . ' ' . $definition);
+        }
+    }
+
+    /** @return array<int, string> */
+    private static function columnsOf(PDO $db, \Nomen\Src\Db\Dialect $dialect, string $table): array
+    {
+        if ($dialect->isSqlite()) {
+            $rows = $db->query('PRAGMA table_info(' . $table . ')')->fetchAll();
+
+            return array_map(static fn(array $col): string => (string)($col['name'] ?? ''), $rows);
+        }
+
+        $stmt = $db->prepare(
+            'SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?'
+        );
+        $stmt->execute([$table]);
+
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
     /**

@@ -139,6 +139,31 @@
     color: var(--color-text);
 }
 
+.docs-nav summary {
+    cursor: pointer;
+    list-style: none;
+}
+
+.docs-nav summary::-webkit-details-marker {
+    display: none;
+}
+
+.docs-nav summary::before {
+    content: '›';
+    display: inline-block;
+    width: 12px;
+    color: var(--color-text-muted);
+    transition: transform 0.15s;
+}
+
+.docs-nav details[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+.docs-nav summary:hover {
+    color: var(--color-text);
+}
+
 .docs-meta {
     display: flex;
     flex-wrap: wrap;
