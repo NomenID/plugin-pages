@@ -268,6 +268,10 @@ class Controller
         header('ETag: ' . $etag);
 
         $ifNoneMatch = trim((string)($_SERVER['HTTP_IF_NONE_MATCH'] ?? ''));
+        // nginx 开了 gzip 会把 ETag 改成弱校验值（W/"..."），比较前先去掉前缀
+        if (str_starts_with($ifNoneMatch, 'W/')) {
+            $ifNoneMatch = substr($ifNoneMatch, 2);
+        }
         if ($ifNoneMatch !== '' && $ifNoneMatch === $etag) {
             http_response_code(304);
             return;

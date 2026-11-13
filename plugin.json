@@ -1,6 +1,6 @@
 {
     "name": "Pages",
-    "version": "1.3.1",
+    "version": "1.3.2",
     "description": "In-site documentation: write guides inside {:sitename}, no separate docs site needed",
     "license": "Apache-2.0",
     "author": [
