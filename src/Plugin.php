@@ -22,6 +22,7 @@ class Plugin
         Plugins::route('POST', $base . '/new', [Controller::class, 'store'], ['auth', 'admin']);
         Plugins::route('GET', $base . '/sitemap', [Controller::class, 'sitemap']);
         Plugins::route('GET', $base . '/assets/pages', [Controller::class, 'css']);
+        Plugins::route('GET', $base . '/assets/pages-js', [Controller::class, 'js']);
         Plugins::route('GET', $base . '/{slug:.*}/edit', [Controller::class, 'edit'], ['auth', 'admin']);
         Plugins::route('POST', $base . '/{slug:.*}/edit', [Controller::class, 'update'], ['auth', 'admin']);
         Plugins::route('POST', $base . '/{slug:.*}/delete', [Controller::class, 'destroy'], ['auth', 'admin']);

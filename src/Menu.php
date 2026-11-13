@@ -103,7 +103,8 @@ final class Menu
 
     /**
      * auto 模式的边栏：有子页的目录折成一组，只有当前页所在的那条链展开，其余收起。
-     * 目录标题只负责展开收起，点目录进 index 页靠组内第一条。
+     * 目录标题链到组内第一个文档（优先 index 页）：没有 JS 就当普通链接，有 JS 时
+     * pages.js 会拦下跳转、只做展开收起。
      */
     public static function renderAuto(array $items, string $current, string $base): string
     {
@@ -127,8 +128,13 @@ final class Menu
                 $url = $base . '/' . $href;
                 $html .= '<a href="' . htmlspecialchars($url) . '">' . htmlspecialchars((string)$item['label']) . '</a>';
             } else {
+                $first = self::firstHref($children, $href);
+                $label = htmlspecialchars((string)$item['label']);
+                if ($first !== '') {
+                    $label = '<a href="' . htmlspecialchars($base . '/' . $first) . '">' . $label . '</a>';
+                }
                 $html .= '<details' . ($here ? ' open' : '') . '>'
-                    . '<summary>' . htmlspecialchars((string)$item['label']) . '</summary>'
+                    . '<summary>' . $label . '</summary>'
                     . self::renderAuto($children, $current, $base)
                     . '</details>';
             }
@@ -136,6 +142,36 @@ final class Menu
         }
 
         return $html . '</ul>';
+    }
+
+    /** 组里第一个可点的页面：优先目录的 index，其次按树里的先后 */
+    private static function firstHref(array $items, string $dir = ''): string
+    {
+        if ($dir !== '') {
+            foreach ($items as $item) {
+                if (empty($item['hidden']) && (string)($item['href'] ?? '') === $dir . '/index') {
+                    return (string)$item['href'];
+                }
+            }
+        }
+
+        foreach ($items as $item) {
+            if (!empty($item['hidden'])) {
+                continue;
+            }
+            if (!empty($item['children'])) {
+                $first = self::firstHref($item['children']);
+                if ($first !== '') {
+                    return $first;
+                }
+                continue;
+            }
+            if ((string)($item['href'] ?? '') !== '') {
+                return (string)$item['href'];
+            }
+        }
+
+        return '';
     }
 
     /** 把树摊平成「缩进文本」，给后台编辑框用 */

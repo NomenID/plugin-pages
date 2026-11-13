@@ -245,6 +245,20 @@ class Controller
         exit;
     }
 
+    public static function js(): void
+    {
+        $file = __DIR__ . '/../assets/pages.js';
+        if (!is_file($file)) {
+            Response::error(404);
+            return;
+        }
+
+        header('Content-Type: text/javascript; charset=utf-8');
+        header('Cache-Control: public, max-age=3600');
+        readfile($file);
+        exit;
+    }
+
     public static function sitemap(): void
     {
         $baseUrl = rtrim((string)Brand::get('base_url'), '/');
@@ -293,6 +307,7 @@ class Controller
             'pageClass' => 'special-page--docs',
             'body' => $body,
             'extraCss' => [self::cssUrl()],
+            'extraJs' => self::jsUrl(),
         ]);
     }
 
@@ -366,6 +381,14 @@ class Controller
         $v = is_file($file) ? substr(md5_file($file), 0, 8) : '0';
 
         return Plugin::basePath() . '/assets/pages?v=' . $v;
+    }
+
+    private static function jsUrl(): string
+    {
+        $file = __DIR__ . '/../assets/pages.js';
+        $v = is_file($file) ? substr(md5_file($file), 0, 8) : '0';
+
+        return Plugin::basePath() . '/assets/pages-js?v=' . $v;
     }
 
     private static function e(string $value): string
