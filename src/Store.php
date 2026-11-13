@@ -682,8 +682,15 @@ class Store
             }
 
             [$meta, $body] = self::frontmatter((string)file_get_contents($base . '/' . $rel));
+            $title = trim((string)($meta['title'] ?? ''));
+            if ($title === '' && preg_match('/\A\s*#\s+(.+?)\s*(?:\R+|\z)/u', $body, $m)) {
+                $title = trim($m[1]);
+                $body = substr($body, strlen($m[0]));
+            }
+            if ($title === '') {
+                $title = trim(basename($rel, '.md'));
+            }
             $body = self::rewriteLinks($body, $prefix, $rel);
-            $title = trim((string)($meta['title'] ?? basename($rel, '.md')));
             if ($title === '') {
                 continue;
             }
