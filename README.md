@@ -61,6 +61,9 @@ php bin/nomen plugins pages:import docs --prefix=local-docs
 → `local-docs/index`），只补缺、不覆盖库里改过的页面。加 `--update` 才会覆盖已有的同名页面
 （用来把站内副本跟 `docs/` 同步）。适合把发布包里的 `docs/` 挂成站内文档。
 
+标题取 frontmatter 的 `title`，没写就用正文第一个 H1 并从正文删掉那一行，再没有才用文件名。
+`--update` 只覆盖标题 / 摘要 / 正文；文件里没写 `sort:` 时保留站里排好的顺序。
+
 ## Markdown
 
 支持标题、段落、列表、引用、代码块、表格、链接、图片、粗体、斜体和删除线。HTML 会被转义，链接只放行 http(s)、mailto 和站内相对地址。
