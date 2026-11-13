@@ -30,6 +30,18 @@ Pages 是独立项目，不属于 Nomen 本体，按 Apache-2.0 单独发布：
 **slug 可以带层级**：`local-docs/install` 就是 `/w/local-docs/install`。访问目录地址（`/w/local-docs`）时，
 先找该目录的 `index` 页；没有就按侧边栏菜单的顺序跳到第一条，再没有就按排序取第一条子页面。
 
+## Sitemap
+
+打开 `base_path + '/sitemap'`（默认 `/w/sitemap`）就是文档站点的 sitemap，按库里的已发布页面
+现场生成，新建、修改、删除页面后不用手动更新。`/w/sitemap.xml` 是同一个地址的别名。
+
+- 草稿不会出现；首页和文档目录首页也会列进去。
+- 目录的 `index` 页按目录地址输出（`/w/local-docs`），只有目录本身也存在同名页面时才保留
+  `/w/local-docs/index`。
+- 页面条目带 `lastmod`，响应带 `ETag` 和 `Cache-Control: public, max-age=3600`。
+- 站点根部的 `/sitemap.xml` 由 Nomen 核心提供，会指向这份文档 sitemap；`/robots.txt` 也已经
+  指向 `/sitemap.xml`。
+
 ## 侧边栏
 
 侧边栏按目录配置，一个目录一份，后台「内容 → 目录」里编辑。每个目录可以选两种方式：

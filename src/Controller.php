@@ -10,7 +10,6 @@
 namespace Nomen\Plugin\Pages;
 
 use Nomen\Src\ActivityLog;
-use Nomen\Src\Brand;
 use Nomen\Src\Csrf;
 use Nomen\Src\Hooks;
 use Nomen\Src\Response;
@@ -261,24 +260,20 @@ class Controller
 
     public static function sitemap(): void
     {
-        $baseUrl = rtrim((string)Brand::get('base_url'), '/');
-        $base = Plugin::basePath();
+        $xml = Sitemap::xml();
+        $etag = '"' . md5($xml) . '"';
 
         header('Content-Type: application/xml; charset=utf-8');
-        echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
-        echo '  <url><loc>' . self::e($baseUrl . '/') . '</loc></url>' . "\n";
-        echo '  <url><loc>' . self::e($baseUrl . $base) . '</loc></url>' . "\n";
+        header('Cache-Control: public, max-age=3600');
+        header('ETag: ' . $etag);
 
-        foreach (Store::all(false) as $page) {
-            echo '  <url><loc>' . self::e($baseUrl . $base . '/' . $page['slug']) . '</loc>';
-            if (!empty($page['updated_at'])) {
-                echo '<lastmod>' . self::e(substr((string)$page['updated_at'], 0, 10)) . '</lastmod>';
-            }
-            echo '</url>' . "\n";
+        $ifNoneMatch = trim((string)($_SERVER['HTTP_IF_NONE_MATCH'] ?? ''));
+        if ($ifNoneMatch !== '' && $ifNoneMatch === $etag) {
+            http_response_code(304);
+            return;
         }
 
-        echo '</urlset>';
+        echo $xml;
         exit;
     }
 
@@ -389,10 +384,5 @@ class Controller
         $v = is_file($file) ? substr(md5_file($file), 0, 8) : '0';
 
         return Plugin::basePath() . '/assets/pages-js?v=' . $v;
-    }
-
-    private static function e(string $value): string
-    {
-        return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 }

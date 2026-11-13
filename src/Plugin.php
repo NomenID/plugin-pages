@@ -21,6 +21,7 @@ class Plugin
         Plugins::route('GET', $base . '/new', [Controller::class, 'create'], ['auth', 'admin']);
         Plugins::route('POST', $base . '/new', [Controller::class, 'store'], ['auth', 'admin']);
         Plugins::route('GET', $base . '/sitemap', [Controller::class, 'sitemap']);
+        Plugins::route('GET', $base . '/sitemap.xml', [Controller::class, 'sitemap']);
         Plugins::route('GET', $base . '/assets/pages', [Controller::class, 'css']);
         Plugins::route('GET', $base . '/assets/pages-js', [Controller::class, 'js']);
         Plugins::route('GET', $base . '/{slug:.*}/edit', [Controller::class, 'edit'], ['auth', 'admin']);
@@ -39,12 +40,12 @@ class Plugin
     }
 
     /**
-     * 文档挂载点。站长在 config/plugins/pages.json 里改，插件目录不用动。
+     * 文档挂载点。默认值由 plugin.json 的 mounts 声明，站长在后台「接入点」
+     * 或 config/plugins/pages.json 里改；这里统一走挂载点，路径变了不用改代码。
      */
     public static function basePath(): string
     {
-        $config = Plugins::config('pages', ['base_path' => '/w']);
-        $base = trim((string)($config['base_path'] ?? '/w'));
+        $base = trim((string)Plugins::mountUrl('pages'));
 
         if ($base === '' || $base === '/') {
             $base = '/w';
