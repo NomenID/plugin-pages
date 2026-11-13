@@ -688,7 +688,7 @@ class Store
             }
 
             [$meta, $body] = self::frontmatter((string)file_get_contents($base . '/' . $rel));
-            $body = self::rewriteLinks($body, $prefix);
+            $body = self::rewriteLinks($body, $prefix, $rel);
             $title = trim((string)($meta['title'] ?? basename($rel, '.md')));
             if ($title === '') {
                 continue;
@@ -727,13 +727,30 @@ class Store
     }
 
     /** 把 Markdown 里的相对 .md 链接改成站内地址，导入后不会变成死链 */
-    private static function rewriteLinks(string $markdown, string $prefix): string
+    /**
+     * 相对链接按导入后的真实路径改写：链接是相对「源文件所在目录」的，
+     * 导入后 slug 拍平到 <前缀>/<源目录>/<文件>，所以先把 ../ 收敛掉再拼前缀。
+     */
+    private static function rewriteLinks(string $markdown, string $prefix, string $rel = ''): string
     {
         $base = Plugin::basePath() . '/' . trim($prefix, '/') . '/';
 
         return (string)preg_replace_callback(
             '/\]\((?!https?:|\/|#|mailto:)([^)\s#]+?)\.md(#[^)\s]*)?\)/u',
-            static fn(array $m): string => '](' . $base . ltrim($m[1], './') . ($m[2] ?? '') . ')',
+            static function (array $m) use ($base, $rel): string {
+                $dir = trim(str_replace('\\', '/', dirname($rel)), '/');
+                $parts = ($dir === '' || $dir === '.') ? [] : explode('/', $dir);
+
+                foreach (explode('/', $m[1]) as $segment) {
+                    if ($segment === '..') {
+                        array_pop($parts);
+                    } elseif ($segment !== '' && $segment !== '.') {
+                        $parts[] = $segment;
+                    }
+                }
+
+                return '](' . $base . implode('/', $parts) . ($m[2] ?? '') . ')';
+            },
             $markdown
         );
     }
