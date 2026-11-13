@@ -695,6 +695,7 @@ class Store
                 continue;
             }
 
+            $hasSort = isset($meta['sort']) && $meta['sort'] !== '';
             $params = [
                 ':slug' => $slug,
                 ':title' => $title,
@@ -704,11 +705,14 @@ class Store
             ];
 
             if ($update && self::find($slug, true) !== null) {
-                $stmt = self::db()->prepare(
-                    'UPDATE pages SET title = :title, summary = :summary, body = :body,
-                            sort_order = :sort_order, updated_at = NOW()
-                     WHERE slug = :slug'
-                );
+                // 文件里没写 sort 就别动站内排好的顺序
+                $sql = 'UPDATE pages SET title = :title, summary = :summary, body = :body'
+                    . ($hasSort ? ', sort_order = :sort_order' : '')
+                    . ', updated_at = NOW() WHERE slug = :slug';
+                if (!$hasSort) {
+                    unset($params[':sort_order']);
+                }
+                $stmt = self::db()->prepare($sql);
                 $stmt->execute($params);
                 $inserted += $stmt->rowCount();
                 continue;
