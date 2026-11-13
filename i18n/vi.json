@@ -30,7 +30,6 @@
   "Available page slugs": "Các định danh trang khả dụng",
   "Body (Markdown)": "Nội dung (Markdown)",
   "Build it from the directory": "Dựng tự động theo thư mục",
-  "Collapse by default when a parent sidebar groups it (it opens automatically when the current page is inside)": "Mặc định thu gọn khi thanh bên cấp trên gộp nó thành nhóm (tự mở khi trang hiện tại nằm trong đó)",
   "Delete \"{:title}\"? This cannot be undone.": "Xóa \"{:title}\"? Thao tác này không thể hoàn tác.",
   "Directory summary": "Tóm tắt thư mục",
   "Directory title": "Tiêu đề thư mục",

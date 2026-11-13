@@ -30,7 +30,6 @@
   "Available page slugs": "Kullanılabilir sayfa slug'ları",
   "Body (Markdown)": "İçerik (Markdown)",
   "Build it from the directory": "Dizinden oluştur",
-  "Collapse by default when a parent sidebar groups it (it opens automatically when the current page is inside)": "Üst kenar çubuğu onu grupladığında varsayılan olarak daraltılır (geçerli sayfa içindeyken otomatik açılır)",
   "Delete \"{:title}\"? This cannot be undone.": "“{:title}” silinsin mi? Bu işlem geri alınamaz.",
   "Directory summary": "Dizin özeti",
   "Directory title": "Dizin başlığı",

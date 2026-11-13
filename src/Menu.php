@@ -102,7 +102,7 @@ final class Menu
     }
 
     /**
-     * auto 模式的边栏：有子页的目录折成一组，当前页所在的组强制展开。
+     * auto 模式的边栏：有子页的目录折成一组，只有当前页所在的那条链展开，其余收起。
      * 目录标题只负责展开收起，点目录进 index 页靠组内第一条。
      */
     public static function renderAuto(array $items, string $current, string $base): string
@@ -127,8 +127,7 @@ final class Menu
                 $url = $base . '/' . $href;
                 $html .= '<a href="' . htmlspecialchars($url) . '">' . htmlspecialchars((string)$item['label']) . '</a>';
             } else {
-                $open = empty($item['collapsed']) || $here;
-                $html .= '<details' . ($open ? ' open' : '') . '>'
+                $html .= '<details' . ($here ? ' open' : '') . '>'
                     . '<summary>' . htmlspecialchars((string)$item['label']) . '</summary>'
                     . self::renderAuto($children, $current, $base)
                     . '</details>';

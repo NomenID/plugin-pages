@@ -30,7 +30,6 @@
   "Available page slugs": "כתובות דפים זמינות",
   "Body (Markdown)": "תוכן (Markdown)",
   "Build it from the directory": "בנייה אוטומטית מהתיקייה",
-  "Collapse by default when a parent sidebar groups it (it opens automatically when the current page is inside)": "מקופל כברירת מחדל כשסרגל צד אב מקבץ אותו (נפתח אוטומטית כשהדף הנוכחי בפנים)",
   "Delete \"{:title}\"? This cannot be undone.": "למחוק את \"{:title}\"? אי אפשר לשחזר.",
   "Directory summary": "תקציר התיקייה",
   "Directory title": "כותרת התיקייה",

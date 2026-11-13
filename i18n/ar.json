@@ -30,7 +30,6 @@
   "Available page slugs": "عناوين الصفحات المتاحة",
   "Body (Markdown)": "المتن (Markdown)",
   "Build it from the directory": "بناؤه تلقائيًا من الدليل",
-  "Collapse by default when a parent sidebar groups it (it opens automatically when the current page is inside)": "يُطوى افتراضيًا عندما يجمعه شريط جانبي أب (يتفتح تلقائيًا إذا كانت الصفحة الحالية داخله)",
   "Delete \"{:title}\"? This cannot be undone.": "حذف «{:title}»؟ لا يمكن التراجع.",
   "Directory summary": "ملخص الدليل",
   "Directory title": "عنوان الدليل",

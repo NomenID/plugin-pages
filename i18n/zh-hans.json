@@ -32,7 +32,6 @@
   "Available page slugs": "可用的页面地址",
   "Body (Markdown)": "正文（Markdown）",
   "Build it from the directory": "按目录自动生成",
-  "Collapse by default when a parent sidebar groups it (it opens automatically when the current page is inside)": "被上级边栏当成一组时默认收起（当前页在里面时自动展开）",
   "Delete \"{:title}\"? This cannot be undone.": "删除「{:title}」？删除后无法恢复。",
   "Directory summary": "目录摘要",
   "Directory title": "目录标题",

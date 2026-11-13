@@ -30,7 +30,6 @@
   "Available page slugs": "Dostępne skróty stron",
   "Body (Markdown)": "Treść (Markdown)",
   "Build it from the directory": "Buduj z katalogu",
-  "Collapse by default when a parent sidebar groups it (it opens automatically when the current page is inside)": "Domyślnie zwinięty, gdy należy do grupy w nadrzędnym pasku bocznym (rozwija się sam, gdy bieżąca strona jest w środku)",
   "Delete \"{:title}\"? This cannot be undone.": "Usunąć „{:title}”? Tej operacji nie można cofnąć.",
   "Directory summary": "Opis katalogu",
   "Directory title": "Tytuł katalogu",

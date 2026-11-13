@@ -82,7 +82,6 @@ class Store
                 title TEXT NOT NULL DEFAULT \'\',
                 summary TEXT NOT NULL DEFAULT \'\',
                 sort_order INTEGER DEFAULT NULL,
-                collapsed INTEGER NOT NULL DEFAULT 0,
                 mode TEXT NOT NULL DEFAULT \'manual\',
                 items TEXT NOT NULL DEFAULT \'\',
                 enabled INTEGER NOT NULL DEFAULT 1,
@@ -93,7 +92,6 @@ class Store
                 `title` VARCHAR(255) NOT NULL DEFAULT \'\',
                 `summary` VARCHAR(500) NOT NULL DEFAULT \'\',
                 `sort_order` INT DEFAULT NULL,
-                `collapsed` TINYINT UNSIGNED NOT NULL DEFAULT 0,
                 `mode` VARCHAR(10) NOT NULL DEFAULT \'manual\',
                 `items` MEDIUMTEXT NOT NULL,
                 `enabled` TINYINT UNSIGNED NOT NULL DEFAULT 1,
@@ -407,13 +405,12 @@ class Store
             ':title' => (string)($fields['title'] ?? ''),
             ':summary' => (string)($fields['summary'] ?? ''),
             ':sort_order' => $fields['sort_order'] ?? null,
-            ':collapsed' => !empty($fields['collapsed']) ? 1 : 0,
             ':mode' => ($fields['mode'] ?? 'manual') === 'auto' ? 'auto' : 'manual',
             ':items' => (string)($fields['items'] ?? ''),
             ':enabled' => !empty($fields['enabled']) ? 1 : 0,
         ];
 
-        $assign = 'title = :title, summary = :summary, sort_order = :sort_order, collapsed = :collapsed,'
+        $assign = 'title = :title, summary = :summary, sort_order = :sort_order,'
             . ' mode = :mode, items = :items, enabled = :enabled';
 
         if (self::menuRow($path) !== null) {
@@ -425,8 +422,8 @@ class Store
         }
 
         $stmt = $db->prepare(
-            'INSERT INTO page_menus (path, title, summary, sort_order, collapsed, mode, items, enabled)
-             VALUES (:p, :title, :summary, :sort_order, :collapsed, :mode, :items, :enabled)'
+            'INSERT INTO page_menus (path, title, summary, sort_order, mode, items, enabled)
+             VALUES (:p, :title, :summary, :sort_order, :mode, :items, :enabled)'
         );
         $stmt->execute($params);
     }
@@ -503,7 +500,7 @@ class Store
 
     /**
      * auto 模式：把某个目录下的页面按 slug 树拼成侧边栏。
-     * 目录标题 / 排序 / 折叠取目录记录，没有就退回 index 页标题和小写连字符转空格。
+     * 目录标题 / 排序取目录记录，没有就退回 index 页标题和小写连字符转空格。
      *
      * @return array<int, array>
      */
@@ -538,7 +535,6 @@ class Store
                 'label' => (string)$page['title'],
                 'href' => $slug,
                 'hidden' => false,
-                'collapsed' => false,
                 'group' => false,
                 'children' => [],
                 'sort' => (int)$page['sort_order'],
@@ -570,7 +566,6 @@ class Store
                 'summary' => $summary,
                 'href' => $path,
                 'hidden' => false,
-                'collapsed' => $row !== null && (int)$row['collapsed'] === 1,
                 'group' => true,
                 'children' => $children,
                 'sort' => $sort,
@@ -628,7 +623,6 @@ class Store
             'title' => "VARCHAR(255) NOT NULL DEFAULT ''",
             'summary' => "VARCHAR(500) NOT NULL DEFAULT ''",
             'sort_order' => 'INT DEFAULT NULL',
-            'collapsed' => 'INTEGER NOT NULL DEFAULT 0',
             'mode' => "VARCHAR(10) NOT NULL DEFAULT 'manual'",
         ];
 

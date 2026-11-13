@@ -84,7 +84,6 @@ class Controller
             'title' => mb_substr(trim((string)($_POST['title'] ?? '')), 0, 255),
             'summary' => mb_substr(trim((string)($_POST['summary'] ?? '')), 0, 500),
             'sort_order' => $sort === '' ? null : (int)$sort,
-            'collapsed' => !empty($_POST['collapsed']),
             'mode' => ($_POST['mode'] ?? 'manual') === 'auto' ? 'auto' : 'manual',
             'items' => (string)json_encode($items, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
             'enabled' => !empty($_POST['enabled']),

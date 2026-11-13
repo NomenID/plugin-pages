@@ -30,7 +30,6 @@
   "Available page slugs": "نشانی‌های صفحه‌های موجود",
   "Body (Markdown)": "متن (Markdown)",
   "Build it from the directory": "ساخت خودکار از مسیر",
-  "Collapse by default when a parent sidebar groups it (it opens automatically when the current page is inside)": "وقتی نوار کناری والد آن را گروه کند به‌طور پیش‌فرض جمع می‌شود (اگر صفحهٔ فعلی داخلش باشد خودکار باز می‌شود)",
   "Delete \"{:title}\"? This cannot be undone.": "حذف «{:title}»؟ این کار برگشت‌پذیر نیست.",
   "Directory summary": "خلاصهٔ مسیر",
   "Directory title": "عنوان مسیر",

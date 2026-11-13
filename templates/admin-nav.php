@@ -15,7 +15,6 @@
  * @var string $title
  * @var string $summary
  * @var string $sort
- * @var bool $collapsed
  * @var string $mode
  * @var string $base
  * @var string $csrf
@@ -77,14 +76,7 @@ $label = static fn(string $path): string => $path === '' ? t('Root ({:base})', [
         <p class="a-hint"><?= t('Smaller numbers come first. Empty follows the first page in the group.') ?></p>
     </div>
 
-    <div class="a-field">
-        <label class="a-check">
-            <input type="checkbox" name="collapsed" value="1" <?= $collapsed ? 'checked' : '' ?>>
-            <span><?= t('Collapse by default when a parent sidebar groups it (it opens automatically when the current page is inside)') ?></span>
-        </label>
-    </div>
     <?php endif; ?>
-
     <div class="a-field">
         <label class="a-label" for="nav_items"><?= t('Sidebar entries') ?></label>
         <textarea id="nav_items" class="a-input a-textarea a-mono" name="items" rows="14"

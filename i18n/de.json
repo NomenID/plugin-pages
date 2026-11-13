@@ -30,7 +30,6 @@
   "Available page slugs": "Verfügbare Seiten-Slugs",
   "Body (Markdown)": "Inhalt (Markdown)",
   "Build it from the directory": "Aus dem Verzeichnis aufbauen",
-  "Collapse by default when a parent sidebar groups it (it opens automatically when the current page is inside)": "Standardmäßig eingeklappt, wenn eine übergeordnete Seitenleiste es gruppiert (es öffnet sich automatisch, wenn die aktuelle Seite darin ist)",
   "Delete \"{:title}\"? This cannot be undone.": "„{:title}“ löschen? Dies kann nicht rückgängig gemacht werden.",
   "Directory summary": "Verzeichniszusammenfassung",
   "Directory title": "Verzeichnistitel",

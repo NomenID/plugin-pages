@@ -30,7 +30,6 @@
   "Available page slugs": "বিদ্যমান পৃষ্ঠার স্লাগ",
   "Body (Markdown)": "মূল অংশ (Markdown)",
   "Build it from the directory": "ডিরেক্টরি থেকে স্বয়ংক্রিয়ভাবে তৈরি",
-  "Collapse by default when a parent sidebar groups it (it opens automatically when the current page is inside)": "প্যারেন্ট সাইডবার দলে থাকলে ডিফল্টে ভাঁজ থাকবে (বর্তমান পৃষ্ঠা ভেতরে থাকলে স্বয়ংক্রিয়ভাবে খোলে)",
   "Delete \"{:title}\"? This cannot be undone.": "\"{:title}\" মুছে ফেলবেন? এটি ফেরানো যাবে না।",
   "Directory summary": "ডিরেক্টরির সারসংক্ষেপ",
   "Directory title": "ডিরেক্টরির শিরোনাম",

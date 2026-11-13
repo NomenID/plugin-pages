@@ -30,7 +30,6 @@
   "Available page slugs": "Доступні слаги сторінок",
   "Body (Markdown)": "Текст (Markdown)",
   "Build it from the directory": "Будувати з каталогу",
-  "Collapse by default when a parent sidebar groups it (it opens automatically when the current page is inside)": "Типово згорнутий, коли входить до групи в батьківській бічній панелі (сам розгортається, коли поточна сторінка всередині)",
   "Delete \"{:title}\"? This cannot be undone.": "Видалити «{:title}»? Цю дію не можна скасувати.",
   "Directory summary": "Опис каталогу",
   "Directory title": "Заголовок каталогу",

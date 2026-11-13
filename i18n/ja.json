@@ -30,7 +30,6 @@
   "Available page slugs": "利用できるページのスラッグ",
   "Body (Markdown)": "本文（Markdown）",
   "Build it from the directory": "ディレクトリから自動生成",
-  "Collapse by default when a parent sidebar groups it (it opens automatically when the current page is inside)": "上位のサイドバーでグループにされるときは既定で折りたたみ（現在のページが含まれるときは自動で開きます）",
   "Delete \"{:title}\"? This cannot be undone.": "「{:title}」を削除しますか？元に戻せません。",
   "Directory summary": "ディレクトリの概要",
   "Directory title": "ディレクトリのタイトル",

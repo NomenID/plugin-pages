@@ -30,7 +30,6 @@
   "Available page slugs": "사용 가능한 페이지 슬러그",
   "Body (Markdown)": "본문 (Markdown)",
   "Build it from the directory": "디렉터리에서 자동 생성",
-  "Collapse by default when a parent sidebar groups it (it opens automatically when the current page is inside)": "상위 사이드바가 그룹으로 묶을 때 기본으로 접힘 (현재 페이지가 그 안에 있으면 자동으로 펼쳐짐)",
   "Delete \"{:title}\"? This cannot be undone.": "'{:title}'을(를) 삭제할까요? 되돌릴 수 없습니다.",
   "Directory summary": "디렉터리 요약",
   "Directory title": "디렉터리 제목",

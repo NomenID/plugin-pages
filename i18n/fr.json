@@ -30,7 +30,6 @@
   "Available page slugs": "Slugs de pages disponibles",
   "Body (Markdown)": "Corps (Markdown)",
   "Build it from the directory": "Construire à partir du répertoire",
-  "Collapse by default when a parent sidebar groups it (it opens automatically when the current page is inside)": "Replié par défaut quand une barre latérale parente le regroupe (il s'ouvre automatiquement quand la page actuelle est dedans)",
   "Delete \"{:title}\"? This cannot be undone.": "Supprimer « {:title} » ? Cette action est irréversible.",
   "Directory summary": "Résumé du répertoire",
   "Directory title": "Titre du répertoire",

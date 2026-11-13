@@ -30,7 +30,6 @@
   "Available page slugs": "Διαθέσιμα slug σελίδων",
   "Body (Markdown)": "Κείμενο (Markdown)",
   "Build it from the directory": "Χτίσιμο από τον κατάλογο",
-  "Collapse by default when a parent sidebar groups it (it opens automatically when the current page is inside)": "Συμπτυγμένο από προεπιλογή όταν ο γονικός πλευρικός τομέας το ομαδοποιεί (ανοίγει αυτόματα όταν η τρέχουσα σελίδα είναι μέσα)",
   "Delete \"{:title}\"? This cannot be undone.": "Διαγραφή «{:title}»; Αυτό δεν μπορεί να αναιρεθεί.",
   "Directory summary": "Σύνοψη καταλόγου",
   "Directory title": "Τίτλος καταλόγου",

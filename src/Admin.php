@@ -100,7 +100,6 @@ class Admin
             'title'    => $row === null ? '' : (string)$row['title'],
             'summary'  => $row === null ? '' : (string)$row['summary'],
             'sort'     => $row === null || $row['sort_order'] === null ? '' : (string)$row['sort_order'],
-            'collapsed' => $row !== null && (int)$row['collapsed'] === 1,
             'mode'     => $row === null ? 'manual' : (string)$row['mode'],
             'base'     => Plugin::basePath(),
             'csrf'     => Csrf::field(),
