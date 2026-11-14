@@ -33,12 +33,14 @@ Pages 是独立项目，不属于 Nomen 本体，按 Apache-2.0 单独发布：
 ## Sitemap
 
 打开 `base_path + '/sitemap'`（默认 `/w/sitemap`）就是文档站点的 sitemap，按库里的已发布页面
-现场生成，新建、修改、删除页面后不用手动更新。`/w/sitemap.xml` 是同一个地址的别名。
+生成，新建、修改、删除页面后不用手动更新。`/w/sitemap.xml` 是同一个地址的别名。
 
 - 草稿不会出现；首页和文档目录首页也会列进去。
 - 目录的 `index` 页按目录地址输出（`/w/local-docs`），只有目录本身也存在同名页面时才保留
   `/w/local-docs/index`。
 - 页面条目带 `lastmod`，响应带 `ETag` 和 `Cache-Control: public, max-age=3600`。
+- 站点配了定时任务的话，`pages.sitemap` 每 10 分钟预生成一份放进缓存；没配 cron 就在请求时
+  现算，顺手缓存 5 分钟。
 - 站点根部的 `/sitemap.xml` 由 Nomen 核心提供，会指向这份文档 sitemap；`/robots.txt` 也已经
   指向 `/sitemap.xml`。
 

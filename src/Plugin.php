@@ -9,6 +9,8 @@
 
 namespace Nomen\Plugin\Pages;
 
+use Nomen\Src\Cache;
+use Nomen\Src\Hooks;
 use Nomen\Src\Plugins;
 
 class Plugin
@@ -34,6 +36,21 @@ class Plugin
 
         Plugins::command('pages:sync', [Store::class, 'sync'], '把 content/ 里还没进库的文档页导入');
         Plugins::command('pages:import', [Store::class, 'importCommand'], '从目录导入 Markdown：pages:import <目录> [--prefix=local-docs]');
+
+        // sitemap 定时预生成：站长配了 cron 就按 10 分钟刷新，没配就在请求里现算
+        Hooks::add('schedule.tasks', static function (array $tasks): array {
+            $tasks[] = [
+                'id'    => 'pages.sitemap',
+                'label' => 'Sitemap',
+                'owner' => 'pages',
+                'every' => 600,
+                'run'   => static function (): void {
+                    Cache::put('pages:sitemap', Sitemap::xml(), 900);
+                },
+            ];
+
+            return $tasks;
+        });
 
         Api::boot();
         Admin::register();

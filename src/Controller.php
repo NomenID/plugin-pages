@@ -10,6 +10,7 @@
 namespace Nomen\Plugin\Pages;
 
 use Nomen\Src\ActivityLog;
+use Nomen\Src\Cache;
 use Nomen\Src\Csrf;
 use Nomen\Src\Hooks;
 use Nomen\Src\Response;
@@ -268,7 +269,12 @@ class Controller
 
     public static function sitemap(): void
     {
-        $xml = Sitemap::xml();
+        // 定时任务每 10 分钟预生成一份；没配 cron 的站就在请求里现算，顺手短缓存
+        $xml = Cache::get('pages:sitemap');
+        if (!is_string($xml) || $xml === '') {
+            $xml = Sitemap::xml();
+            Cache::put('pages:sitemap', $xml, 300);
+        }
         $etag = '"' . md5($xml) . '"';
 
         header('Content-Type: application/xml; charset=utf-8');
