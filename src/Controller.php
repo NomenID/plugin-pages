@@ -56,16 +56,23 @@ class Controller
             }
         }
 
+        $pages = Store::all($isAdmin);
         $sidebar = Store::sidebarFor((string)$page['slug'], $isAdmin);
+
+        $toc = [];
+        $article = Markdown::render((string)$page['body'], $toc);
 
         self::render('page', [
             'page' => $page,
-            'pages' => Store::all($isAdmin),
+            'pages' => $pages,
             'menu' => $sidebar['items'] ?? null,
             'menuMode' => $sidebar['mode'] ?? 'manual',
             'base' => Plugin::basePath(),
             'isAdmin' => $isAdmin,
-            'article' => Markdown::render((string)$page['body']),
+            'article' => $article,
+            'toc' => $toc,
+            'crumbs' => Nav::crumbs($page, Plugin::basePath()),
+            'pager' => Nav::pager($sidebar['items'] ?? null, (string)$page['slug'], $pages),
             'notice' => Session::getFlash('pages_success'),
         ], (string)$page['title']);
     }

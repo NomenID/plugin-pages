@@ -596,6 +596,27 @@ class Store
         return null;
     }
 
+    /** 目录的显示名：目录记录 > 目录的 index 页标题 > slug 连字符转空格 */
+    public static function labelFor(string $path, bool $includeDrafts = false): string
+    {
+        $path = trim($path, '/');
+        if ($path === '') {
+            return t('Docs');
+        }
+
+        $row = self::menuRow($path);
+        if ($row !== null && trim((string)$row['title']) !== '') {
+            return trim((string)$row['title']);
+        }
+
+        $index = self::find($path . '/index', $includeDrafts);
+        if ($index !== null) {
+            return (string)$index['title'];
+        }
+
+        return self::humanize(basename($path));
+    }
+
     private static function humanize(string $segment): string
     {
         return ucfirst(str_replace('-', ' ', $segment));

@@ -15,11 +15,29 @@ namespace Nomen\Plugin\Pages;
  */
 class Markdown
 {
-    public static function render(string $text): string
+    /** @var array<int, array{level:int,id:string,text:string}> 最近一次 render 收集到的标题 */
+    private static array $toc = [];
+
+    /** @var array<string, true> 本次渲染里已用过的锚点，重名标题加 -1 / -2 */
+    private static array $anchors = [];
+
+    /**
+     * @param array<int, array{level:int,id:string,text:string}>|null $toc 传变量进来就填本页的 h2 / h3
+     */
+    public static function render(string $text, ?array &$toc = null): string
     {
         $text = str_replace(["\r\n", "\r", "\x00"], ["\n", "\n", ''], $text);
 
-        return self::blocks(explode("\n", $text));
+        self::$toc = [];
+        self::$anchors = [];
+
+        $html = self::blocks(explode("\n", $text));
+
+        if ($toc !== null) {
+            $toc = self::$toc;
+        }
+
+        return $html;
     }
 
     private static function blocks(array $lines): string
@@ -60,7 +78,12 @@ class Markdown
 
             if (preg_match('/^\s{0,3}(#{1,6})\s+(.*?)\s*#*\s*$/', $line, $m)) {
                 $level = strlen($m[1]);
-                $out[] = '<h' . $level . '>' . self::inline($m[2]) . '</h' . $level . '>';
+                $plain = self::plain($m[2]);
+                $id = self::anchor($plain);
+                if ($level === 2 || $level === 3) {
+                    self::$toc[] = ['level' => $level, 'id' => $id, 'text' => $plain];
+                }
+                $out[] = '<h' . $level . ' id="' . $id . '">' . self::inline($m[2]) . '</h' . $level . '>';
                 $i++;
                 continue;
             }
@@ -98,6 +121,41 @@ class Markdown
         }
 
         return implode("\n", $out);
+    }
+
+    /** 标题的纯文本：去掉链接、图片、行内代码和强调符号，给锚点和目录当文字 */
+    private static function plain(string $text): string
+    {
+        $text = preg_replace('/!\[([^\]]*)\]\([^)]*\)/u', '$1', $text) ?? $text;
+        $text = preg_replace('/\[([^\]]+)\]\([^)]*\)/u', '$1', $text) ?? $text;
+        $text = preg_replace('/`([^`]*)`/u', '$1', $text) ?? $text;
+        $text = preg_replace('/\*\*(.+?)\*\*|__(.+?)__/u', '$1$2', $text) ?? $text;
+        $text = preg_replace('/\*(.+?)\*|_(.+?)_/u', '$1$2', $text) ?? $text;
+        $text = preg_replace('/~~(.+?)~~/u', '$1', $text) ?? $text;
+
+        return trim(html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+    }
+
+    /** 锚点：小写、去标点、空白转连字符，重名的按 -1 / -2 递增 */
+    private static function anchor(string $text): string
+    {
+        $id = mb_strtolower($text, 'UTF-8');
+        $id = preg_replace('/[^\p{L}\p{N}\s_-]+/u', '', $id) ?? $id;
+        $id = preg_replace('/[\s_-]+/u', '-', $id) ?? $id;
+        $id = trim($id, '-');
+        if ($id === '') {
+            $id = 'section';
+        }
+
+        $base = $id;
+        $n = 0;
+        while (isset(self::$anchors[$id])) {
+            $n++;
+            $id = $base . '-' . $n;
+        }
+        self::$anchors[$id] = true;
+
+        return $id;
     }
 
     private static function startsBlock(array $lines, int $i): bool
