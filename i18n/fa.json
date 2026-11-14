@@ -49,5 +49,8 @@
   "View on site": "نمایش در سایت",
   "Write entries by hand": "نوشتن دستی موارد",
   "{:count} pages": "{:count} صفحه",
-  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "مستندات درون‌سایتی: راهنماها را داخل {:sitename} بنویسید، سایت مستندات جداگانه لازم نیست"
+  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "مستندات درون‌سایتی: راهنماها را داخل {:sitename} بنویسید، سایت مستندات جداگانه لازم نیست",
+    "Hide": "Hide",
+    "Show navigation": "Show navigation",
+    "Show page contents": "Show page contents"
 }

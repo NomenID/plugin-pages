@@ -49,5 +49,8 @@
   "View on site": "在站台檢視",
   "Write entries by hand": "手動寫條目",
   "{:count} pages": "共 {:count} 篇",
-  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "站內文件：在 {:sitename} 裡寫指南，不需要單獨的文件站"
+  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "站內文件：在 {:sitename} 裡寫指南，不需要單獨的文件站",
+    "Hide": "隱藏",
+    "Show navigation": "顯示導覽",
+    "Show page contents": "顯示本頁目錄"
 }

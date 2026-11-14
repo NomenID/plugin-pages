@@ -49,5 +49,8 @@
   "View on site": "Lihat di tapak",
   "Write entries by hand": "Tulis entri secara manual",
   "{:count} pages": "{:count} halaman",
-  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "Dokumentasi dalam tapak: tulis panduan dalam {:sitename}, tanpa perlu tapak dokumentasi berasingan"
+  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "Dokumentasi dalam tapak: tulis panduan dalam {:sitename}, tanpa perlu tapak dokumentasi berasingan",
+    "Hide": "Hide",
+    "Show navigation": "Show navigation",
+    "Show page contents": "Show page contents"
 }

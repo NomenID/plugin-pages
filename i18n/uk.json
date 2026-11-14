@@ -49,5 +49,8 @@
   "View on site": "Переглянути на сайті",
   "Write entries by hand": "Писати записи вручну",
   "{:count} pages": "Сторінок: {:count}",
-  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "Документація на сайті: пишіть посібники всередині {:sitename}, окремий сайт документації не потрібен"
+  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "Документація на сайті: пишіть посібники всередині {:sitename}, окремий сайт документації не потрібен",
+    "Hide": "Hide",
+    "Show navigation": "Show navigation",
+    "Show page contents": "Show page contents"
 }

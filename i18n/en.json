@@ -49,5 +49,8 @@
     "View": "View",
     "View on site": "View on site",
     "Write entries by hand": "Write entries by hand",
-    "{:count} pages": "{:count} pages"
+    "{:count} pages": "{:count} pages",
+    "Hide": "Hide",
+    "Show navigation": "Show navigation",
+    "Show page contents": "Show page contents"
 }

@@ -49,5 +49,8 @@
   "View on site": "사이트에서 보기",
   "Write entries by hand": "항목 직접 작성",
   "{:count} pages": "{:count}개 페이지",
-  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "사이트 내 문서: {:sitename} 안에서 가이드를 작성하세요, 별도 문서 사이트가 필요 없습니다"
+  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "사이트 내 문서: {:sitename} 안에서 가이드를 작성하세요, 별도 문서 사이트가 필요 없습니다",
+    "Hide": "Hide",
+    "Show navigation": "Show navigation",
+    "Show page contents": "Show page contents"
 }

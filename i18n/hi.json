@@ -49,5 +49,8 @@
   "View on site": "साइट पर देखें",
   "Write entries by hand": "प्रविष्टियाँ हाथ से लिखें",
   "{:count} pages": "{:count} पेज",
-  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "साइट के भीतर दस्तावेज़ीकरण: {:sitename} के अंदर गाइड लिखें, अलग दस्तावेज़ साइट की ज़रूरत नहीं"
+  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "साइट के भीतर दस्तावेज़ीकरण: {:sitename} के अंदर गाइड लिखें, अलग दस्तावेज़ साइट की ज़रूरत नहीं",
+    "Hide": "Hide",
+    "Show navigation": "Show navigation",
+    "Show page contents": "Show page contents"
 }

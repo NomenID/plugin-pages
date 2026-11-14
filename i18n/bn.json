@@ -49,5 +49,8 @@
   "View on site": "সাইটে দেখুন",
   "Write entries by hand": "ভুক্তি হাতে লেখা",
   "{:count} pages": "{:count}টি পৃষ্ঠা",
-  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "সাইটের ভেতরের ডকুমেন্টেশন: {:sitename}-এর ভেতরে গাইড লিখুন, আলাদা ডক সাইট লাগে না"
+  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "সাইটের ভেতরের ডকুমেন্টেশন: {:sitename}-এর ভেতরে গাইড লিখুন, আলাদা ডক সাইট লাগে না",
+    "Hide": "Hide",
+    "Show navigation": "Show navigation",
+    "Show page contents": "Show page contents"
 }

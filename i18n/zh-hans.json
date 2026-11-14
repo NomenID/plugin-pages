@@ -50,5 +50,8 @@
   "View": "查看",
   "View on site": "在站点查看",
   "Write entries by hand": "手动写条目",
-  "{:count} pages": "共 {:count} 篇"
+  "{:count} pages": "共 {:count} 篇",
+    "Hide": "隐藏",
+    "Show navigation": "显示导航",
+    "Show page contents": "显示本页目录"
 }

@@ -49,5 +49,8 @@
   "View on site": "Xem trên trang",
   "Write entries by hand": "Tự viết các mục",
   "{:count} pages": "{:count} trang",
-  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "Tài liệu trong trang: viết hướng dẫn ngay trong {:sitename}, không cần trang tài liệu riêng"
+  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "Tài liệu trong trang: viết hướng dẫn ngay trong {:sitename}, không cần trang tài liệu riêng",
+    "Hide": "Hide",
+    "Show navigation": "Show navigation",
+    "Show page contents": "Show page contents"
 }

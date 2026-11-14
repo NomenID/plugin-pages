@@ -49,5 +49,8 @@
   "View on site": "Sitede görüntüle",
   "Write entries by hand": "Girdileri elle yaz",
   "{:count} pages": "{:count} sayfa",
-  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "Site içi belgeler: rehberleri {:sitename} içinde yazın, ayrı bir belge sitesine gerek yok"
+  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "Site içi belgeler: rehberleri {:sitename} içinde yazın, ayrı bir belge sitesine gerek yok",
+    "Hide": "Hide",
+    "Show navigation": "Show navigation",
+    "Show page contents": "Show page contents"
 }

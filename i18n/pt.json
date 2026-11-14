@@ -49,5 +49,8 @@
   "View on site": "Ver no site",
   "Write entries by hand": "Escrever as entradas à mão",
   "{:count} pages": "{:count} páginas no total",
-  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "Documentação no site: escreva guias dentro de {:sitename}, sem precisar de um site de documentação separado"
+  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "Documentação no site: escreva guias dentro de {:sitename}, sem precisar de um site de documentação separado",
+    "Hide": "Hide",
+    "Show navigation": "Show navigation",
+    "Show page contents": "Show page contents"
 }

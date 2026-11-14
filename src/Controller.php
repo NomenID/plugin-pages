@@ -71,6 +71,7 @@ class Controller
             'isAdmin' => $isAdmin,
             'article' => $article,
             'toc' => $toc,
+            'panes' => self::hiddenPanes(),
             'crumbs' => Nav::crumbs($page, Plugin::basePath()),
             'pager' => Nav::pager($sidebar['items'] ?? null, (string)$page['slug'], $pages),
             'notice' => Session::getFlash('pages_success'),
@@ -379,6 +380,23 @@ class Controller
         if (!is_string($token) || !Csrf::validate($token)) {
             Response::error(400, t('Invalid request, try again'));
         }
+    }
+
+    /**
+     * 侧栏折叠状态由页面脚本写进 cookie，这里读回来先渲染好，避免刷新时闪一下。
+     *
+     * @return array{nav: bool, toc: bool}
+     */
+    private static function hiddenPanes(): array
+    {
+        $raw = $_COOKIE['nomen_docs_panes'] ?? '';
+        $raw = is_string($raw) ? $raw : '';
+        $hidden = explode('-', $raw);
+
+        return [
+            'nav' => in_array('nav', $hidden, true),
+            'toc' => in_array('toc', $hidden, true),
+        ];
     }
 
     private static function cssUrl(): string

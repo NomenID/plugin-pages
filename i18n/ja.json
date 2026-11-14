@@ -49,5 +49,8 @@
   "View on site": "サイトで表示",
   "Write entries by hand": "手動で項目を書く",
   "{:count} pages": "{:count} ページ",
-  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "サイト内ドキュメント：{:sitename} の中でガイドを書けます、別のドキュメントサイトは不要"
+  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "サイト内ドキュメント：{:sitename} の中でガイドを書けます、別のドキュメントサイトは不要",
+    "Hide": "Hide",
+    "Show navigation": "Show navigation",
+    "Show page contents": "Show page contents"
 }

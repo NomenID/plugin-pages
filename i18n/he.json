@@ -49,5 +49,8 @@
   "View on site": "הצגה באתר",
   "Write entries by hand": "כתיבת רשומות ידנית",
   "{:count} pages": "{:count} דפים",
-  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "תיעוד באתר: כתבו מדריכים בתוך {:sitename}, בלי אתר תיעוד נפרד"
+  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "תיעוד באתר: כתבו מדריכים בתוך {:sitename}, בלי אתר תיעוד נפרד",
+    "Hide": "Hide",
+    "Show navigation": "Show navigation",
+    "Show page contents": "Show page contents"
 }

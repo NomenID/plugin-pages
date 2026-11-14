@@ -49,5 +49,8 @@
   "View on site": "Zobacz na witrynie",
   "Write entries by hand": "Pisz wpisy ręcznie",
   "{:count} pages": "Liczba stron: {:count}",
-  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "Dokumentacja w witrynie: pisz poradniki w {:sitename}, bez osobnej strony dokumentacji"
+  "In-site documentation: write guides inside {:sitename}, no separate docs site needed": "Dokumentacja w witrynie: pisz poradniki w {:sitename}, bez osobnej strony dokumentacji",
+    "Hide": "Hide",
+    "Show navigation": "Show navigation",
+    "Show page contents": "Show page contents"
 }

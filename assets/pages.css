@@ -128,10 +128,55 @@
     font-size: 0.9rem;
 }
 
+/* 侧栏折叠：隐藏后正文顶上留一个小按钮把它拉回来 */
+@media (min-width: 1080px) {
+    .docs-layout--nav-hidden,
+    .docs-layout--toc-hidden,
+    .docs-layout--solo.docs-layout--toc.docs-layout--toc-hidden {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: "article";
+        gap: 0;
+    }
+
+    .docs-layout--nav-hidden.docs-layout--toc:not(.docs-layout--toc-hidden) {
+        grid-template-columns: minmax(0, 1fr) 200px;
+        grid-template-areas: "article toc";
+        gap: 40px;
+    }
+
+    .docs-layout--toc-hidden.docs-layout--toc:not(.docs-layout--nav-hidden):not(.docs-layout--solo) {
+        grid-template-columns: 200px minmax(0, 1fr);
+        grid-template-areas: "nav article";
+        gap: 48px;
+    }
+
+    .docs-layout--nav-hidden .docs-nav,
+    .docs-layout--toc-hidden .docs-toc {
+        display: none;
+    }
+
+    .docs-js .docs-layout--nav-hidden .docs-reveal--nav,
+    .docs-js .docs-layout--toc-hidden .docs-reveal--toc {
+        display: inline-flex;
+    }
+}
+
 .docs-article {
     grid-area: article;
     /* 不加这个，宽表格会把整个网格列撑出视口（grid 子项 min-width 默认 auto） */
     min-width: 0;
+}
+
+.docs-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.docs-titlebar .docs-crumbs {
+    flex: 1 1 auto;
+    margin: 0;
 }
 
 .docs-crumbs {
@@ -164,13 +209,72 @@
     font-size: 0.875rem;
 }
 
-.docs-toc__title {
+.docs-toc__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
     margin-bottom: 10px;
+}
+
+.docs-toc__title {
     font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--color-text-muted);
+}
+
+/* 有 JS 才出按钮：没有 JS 时侧栏照旧常驻，别留个点不动的按钮 */
+.docs-pane-btn {
+    display: none;
+}
+
+.docs-js .docs-pane-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 4px;
+    border: 0;
+    border-radius: var(--color-radius);
+    background: transparent;
+    color: var(--color-text-muted);
+    font: inherit;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.docs-js .docs-pane-btn:hover {
+    color: var(--color-text);
+    background: var(--color-bg-secondary);
+}
+
+.docs-js .docs-pane-btn--reveal {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+}
+
+.docs-js .docs-pane-btn--reveal:hover {
+    color: var(--color-text);
+    background: var(--color-bg-secondary);
+}
+
+.docs-js .docs-pane-btn--reveal svg {
+    display: block;
+}
+
+/* RTL 下网格自动镜像，箭头也跟着指回去 */
+[dir="rtl"] .docs-reveal--nav svg,
+[dir="rtl"] .docs-reveal--toc svg {
+    transform: scaleX(-1);
 }
 
 .docs-toc__list {
@@ -269,9 +373,16 @@
     font-size: 0.95rem;
 }
 
+.docs-nav__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
 .docs-nav__home {
     display: block;
-    margin-bottom: 12px;
     color: var(--color-text-muted);
     text-decoration: none;
 }
@@ -565,6 +676,11 @@
 }
 
 @media (max-width: 1079px) {
+    /* 窄屏侧栏本来就是整块 / 折叠块，不需要再藏 */
+    .docs-js .docs-pane-btn {
+        display: none;
+    }
+
     .docs-layout--toc {
         grid-template-columns: 200px minmax(0, 1fr);
         grid-template-areas: "nav article";
