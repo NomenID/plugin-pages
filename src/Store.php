@@ -10,12 +10,15 @@
 
 namespace Nomen\Plugin\Pages;
 
+use Nomen\Src\Cache;
 use Nomen\Src\Cli\Sql;
 use Nomen\Src\Database;
 use PDO;
 
 class Store
 {
+    private const CACHE_TTL = 600;
+
     private static bool $ready = false;
 
     public static function db(): PDO
@@ -120,7 +123,9 @@ class Store
         }
         $sql .= ' ORDER BY sort_order ASC, id ASC';
 
-        return self::db()->query($sql)->fetchAll();
+        $key = 'pages:v' . Cache::generation('pages') . ':all:' . ($includeDrafts ? 'drafts' : 'public');
+
+        return Cache::remember($key, self::CACHE_TTL, static fn(): array => self::db()->query($sql)->fetchAll());
     }
 
     public static function find(string $slug, bool $includeDrafts = false): ?array
@@ -166,7 +171,10 @@ class Store
             ':updated_by' => $userId,
         ]);
 
-        return (int)self::db()->lastInsertId();
+        $id = (int)self::db()->lastInsertId();
+        self::bump();
+
+        return $id;
     }
 
     public static function update(int $id, array $data, int $userId): void
@@ -187,12 +195,22 @@ class Store
             ':updated_by' => $userId,
             ':id' => $id,
         ]);
+
+        self::bump();
     }
 
     public static function delete(int $id): void
     {
         $stmt = self::db()->prepare('DELETE FROM pages WHERE id = :id');
         $stmt->execute([':id' => $id]);
+
+        self::bump();
+    }
+
+    /** 页面或目录变了，列表 / 侧边栏的旧缓存整体作废 */
+    private static function bump(): void
+    {
+        Cache::bump('pages');
     }
 
     public static function makeSlug(string $value): string
@@ -214,7 +232,12 @@ class Store
     /** 只补缺，不覆盖已经在库里改过的页面。 */
     public static function sync(): int
     {
-        return self::seed(self::db());
+        $inserted = self::seed(self::db());
+        if ($inserted > 0) {
+            self::bump();
+        }
+
+        return $inserted;
     }
 
     private static function seed(PDO $db): int
@@ -418,6 +441,7 @@ class Store
                 'UPDATE page_menus SET ' . $assign . ', updated_at = ' . Database::dialectFor($db)->now() . ' WHERE path = :p'
             );
             $stmt->execute($params);
+            self::bump();
             return;
         }
 
@@ -426,6 +450,7 @@ class Store
              VALUES (:p, :title, :summary, :sort_order, :mode, :items, :enabled)'
         );
         $stmt->execute($params);
+        self::bump();
     }
 
     /**
@@ -747,6 +772,10 @@ class Store
             );
             $stmt->execute($params);
             $inserted += $stmt->rowCount();
+        }
+
+        if ($inserted > 0) {
+            self::bump();
         }
 
         return $inserted;

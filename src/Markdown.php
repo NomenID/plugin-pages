@@ -9,12 +9,19 @@
 
 namespace Nomen\Plugin\Pages;
 
+use Nomen\Src\Cache;
+
 /**
  * 够用就行的 Markdown：标题、段落、列表、引用、代码块、表格、链接、图片、强调。
  * HTML 一律转义，链接只放行 http(s)、mailto、站内相对地址。
  */
 class Markdown
 {
+    // 渲染规则改了就把版本 +1，别让旧 HTML 继续命中
+    private const CACHE_VERSION = '1';
+
+    private const CACHE_TTL = 7 * 24 * 3600;
+
     /** @var array<int, array{level:int,id:string,text:string}> 最近一次 render 收集到的标题 */
     private static array $toc = [];
 
@@ -27,7 +34,29 @@ class Markdown
     public static function render(string $text, ?array &$toc = null): string
     {
         $text = str_replace(["\r\n", "\r", "\x00"], ["\n", "\n", ''], $text);
+        $key = 'pages:md:v' . self::CACHE_VERSION . ':' . sha1($text);
 
+        $cached = Cache::remember($key, self::CACHE_TTL, static function () use ($text): array {
+            $built = [];
+            $html = self::renderNow($text, $built);
+
+            return ['html' => $html, 'toc' => $built];
+        });
+
+        if (is_array($cached) && isset($cached['html'])) {
+            if ($toc !== null) {
+                $toc = is_array($cached['toc'] ?? null) ? $cached['toc'] : [];
+            }
+
+            return (string)$cached['html'];
+        }
+
+        return self::renderNow($text, $toc);
+    }
+
+    /** @param array<int, array{level:int,id:string,text:string}>|null $toc */
+    private static function renderNow(string $text, ?array &$toc = null): string
+    {
         self::$toc = [];
         self::$anchors = [];
 
