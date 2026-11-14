@@ -130,6 +130,8 @@
 
 .docs-article {
     grid-area: article;
+    /* 不加这个，宽表格会把整个网格列撑出视口（grid 子项 min-width 默认 auto） */
+    min-width: 0;
 }
 
 .docs-crumbs {
