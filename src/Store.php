@@ -219,8 +219,9 @@ class Store
         $segments = [];
 
         foreach (explode('/', $value) as $segment) {
-            $segment = preg_replace('/[^a-z0-9-]+/', '-', $segment) ?? '';
-            $segment = trim($segment, '-');
+            // 点号是合法字符：版本页用 version/1.8.4 这种地址
+            $segment = preg_replace('/[^a-z0-9.-]+/', '-', $segment) ?? '';
+            $segment = trim($segment, '.-');
             if ($segment !== '') {
                 $segments[] = $segment;
             }
